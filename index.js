@@ -1,3 +1,4 @@
+require('dotenv');
 const { Client, GatewayIntentBits } = require("discord.js");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } =  require("@discordjs/voice");
 const ytdl = require("ytdl-core");
@@ -12,7 +13,7 @@ const client = new Client({
     ]
 });
 
-const token = "MTE5NjIyNDY0NTExNzAwNTkxNQ.G91fci.aXaqoQG7cQUf_H5lcUJiwBFvJ4L-dRgL0h4e5Y"; // todo make .env
+const token = process.env.MESIBOT_TOKEN;
 
 client.once("ready", () => {
     console.log("Bot is online!");
