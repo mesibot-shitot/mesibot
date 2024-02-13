@@ -1,8 +1,11 @@
-require('dotenv');
-const { Client, GatewayIntentBits } = require("discord.js");
+require('dotenv').config();
+const { Client, GatewayIntentBits,Collection} = require("discord.js");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } =  require("@discordjs/voice");
-const ytdl = require("ytdl-core");
-const { GetListByKeyword } = require("youtube-search-api");
+const path = require('path');
+const fs = require('fs');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+
 
 const client = new Client({
     intents: [
@@ -19,36 +22,60 @@ client.once("ready", () => {
     console.log("Bot is online!");
 });
 
-client.on("messageCreate", async (message) => {
-    console.log({ message });
-    if (message.author.bot || !message.guildId) return;
-    if (!message.content.startsWith("mesi play")) return; //todo insert commands router here
+const commands = [];
+client.commands = new Collection();
 
-    const args = message.content.split(" ").slice(2); // get song name from message
-    if (!args.length) return message.reply("Please provide a song name.");
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-    const songInfo = await GetListByKeyword(args.join(" "), false);
-    if (!songInfo || songInfo.items.length === 0) return message.reply("Song not found.");
+for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    try {
+        const command = require(filePath);
+        client.commands.set(command.data.name, command);
+        commands.push(command.data.toJSON());
+    } catch (error) {
+        console.error(`Error loading command file ${file}:`, error);
+    }
+}
 
-    const songUrl = `https://www.youtube.com/watch?v=${songInfo.items[0].id}`;
 
-        const channel = message.member.voice.channel;
-    if (!channel) return message.reply("You need to be in a voice channel.");
 
-    const connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: message.guildId,
-        adapterCreator: message.guild.voiceAdapterCreator
-    });
-
-    const stream = ytdl(songUrl, { quality: 'highestaudio', format: 'audioonly' });
-    const resource = createAudioResource(stream);
-    const player = createAudioPlayer();
-
-    player.play(resource);
-    connection.subscribe(player);
-
-    await message.reply(`Now playing: **${songInfo.items[0].title}**`);
+client.on('ready', () => {
+    const guildIds = client.guilds.cache.map(guild => guild.id);
+    const rest = new REST({ version: '10' }).setToken(token);
+    for (const guildId of guildIds) {
+        rest.put(Routes.applicationGuildCommands(process.env.MESIBOT_ID, guildId), {
+            body: commands
+        })
+            .then(() => console.log(`Added commands to ${guildId}`))
+            .catch(console.error);
+    }
 });
+
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+    const channel = interaction.member.voice.channel;
+            if (!channel) {
+                return interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
+            }
+    const connection = joinVoiceChannel({
+                channelId: channel.id,
+                guildId: interaction.guildId,
+                adapterCreator: interaction.guild.voiceAdapterCreator
+            });
+    try {
+        await command.execute({ client, interaction });
+    } catch (err) {
+        console.error(err);
+        await interaction.reply('An error occurred while executing that command.');
+    }
+});
+
+
 
 client.login(token);
