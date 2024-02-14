@@ -16,41 +16,52 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-
-const controller = new CommandController(client);
+const controller = new CommandController();
 const token = process.env.MESIBOT_TOKEN;
-
+client.commands = new Collection();
 client.once('ready', () => {
-  console.log('Bot is online!');
-  const guildIds = client.guilds.cache.map((guild) => guild.id);
-  const rest = new REST({ version: '10' }).setToken(token);
-  for (const guildId of guildIds) {
-    rest.put(Routes.applicationGuildCommands(process.env.MESIBOT_ID, guildId), {
-      body: controller.commands,
-    })
-      .then(() => console.log(`Added commands to ${guildId}`))
-      .catch(console.error);
-  }
+  controller.reloadCommands();
 });
-client.on('interactionCreate', async (interaction) => {
-  console.log(interaction, interaction.commandName);
-  if (!interaction.isCommand()) return;
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
+// (async () => {
+//   try {
+//     console.log('Started refreshing application (/) commands.');
+//
+//     await rest.put(
+//       Routes.applicationCommands(clientId),
+//       { body: controller.commands },
+//     );
+//
+//     console.log('Successfully reloaded application (/) commands.');
+//   } catch (error) {
+//     console.error(error);
+//   }
+// })();
 
+// client.once('ready', () => {
+//   const guildIds = client.guilds.cache.map((guild) => guild.id);
+//   const rest = new REST({ version: '10' }).setToken(token);
+//   guildIds.forEach((guildId) => {
+//     // this is the endpoint for adding commands to a guild
+//     rest.put(Routes.applicationGuildCommands(process.env.MESIBOT_ID, guildId), {
+//       body: controller.commands,
+//     })
+//       .then(() => console.log(`Added commands to ${guildId}`))
+//       .catch(console.error);
+//   });
+//   console.log('Bot is online!');
+// });
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
   const { channel } = interaction.member.voice;
   if (!channel) {
-    return interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
+    interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
+    return;
   }
-
-  const connection = joinVoiceChannel({
-    channelId: channel.id,
-    guildId: interaction.guildId,
-    adapterCreator: interaction.guild.voiceAdapterCreator,
-  });
-
+  if (!controller.connection) {
+    controller.createConnection(interaction);
+  }
   try {
-    await command.execute({ interaction, connection });
+    await controller.doCommand(interaction);
   } catch (error) {
     console.error(error);
     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

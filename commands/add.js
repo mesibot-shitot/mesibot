@@ -13,22 +13,24 @@ module.exports = {
       .setName('song')
       .setDescription('The name of the song to play.')
       .setRequired(true)),
-  execute: async ({ interaction, connection }) => {
+  execute: async ({ interaction, player }) => {
     const songName = interaction.options.getString('song');
 
     if (!songName) {
-      return interaction.reply({ content: 'Please provide a song name.', ephemeral: true });
+      interaction.reply({ content: 'Please provide a song name.', ephemeral: true });
+      return;
     }
     try {
       const songInfo = await GetListByKeyword(songName, false);
       if (!songInfo || songInfo.items.length === 0) {
-        return interaction.reply({ content: 'Song not found.', ephemeral: true });
+        interaction.reply({ content: 'Song not found.', ephemeral: true });
+        return;
       }
       const topResults = songInfo.items.slice(0, 5);
 
       // Create buttons for each result
       const buttons = topResults.map((item, index) => new ButtonBuilder()
-        .setLabel(item.title)
+        .setLabel(`${item.title.split(' ').slice(0, 7).join(' ')}...`)
         .setStyle(ButtonStyle.Primary)
         .setCustomId(`song_${index}`));
 
@@ -44,9 +46,7 @@ module.exports = {
         const songUrl = `https://www.youtube.com/watch?v=${topResults[index].id}`;
         const stream = ytdl(songUrl, { quality: 'highestaudio', format: 'audioonly' });
         const resource = createAudioResource(stream);
-        const player = createAudioPlayer();
         player.play(resource);
-        connection.subscribe(player);
         buttonInteraction.reply(`Now playing: **${topResults[index].title}**`);
       });
     } catch (error) {
