@@ -1,12 +1,14 @@
-// a playlist class that has a queue of songs
+const PriorityQueue = require('priorityqueuejs');
+
 class Playlist {
   constructor() {
-    this.queue = [];
+    this.queue = new PriorityQueue((songA, songB) => songA.priority - songB.priority);
+    this.playedList = [];
   }
 
   // adds a song to the queue
   addTrack(song) {
-    this.queue.push(song);
+    this.queue.enq(song);
   }
 
   // removes a song from the queue

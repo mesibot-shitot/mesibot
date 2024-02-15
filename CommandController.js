@@ -8,20 +8,6 @@ const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
 class CommandController {
   constructor() {
     this.commandCollection = new Map();
-    // this is for the rest.put method that adds commands to the guilds
-    // client.commands = new Collection();
-
-    //
-    // commandFiles.forEach((file) => {
-    //   const commandsPath = path.join(foldersPath, file);
-    //   const command = require(commandsPath);
-    //   if ('data' in command && 'execute' in command) {
-    //     client.commands.set(command.data.name, command);
-    //     this.commands.push(command.data.toJSON());
-    //   } else {
-    //     console.log(`[WARNING] The command at ${commandsPath} is missing a required "data" or "execute" property.`);
-    //   }
-    // });
   }
 
   async reloadCommands() {
@@ -66,12 +52,8 @@ class CommandController {
     console.log('Bot is online!');
   }
 
-  isCommandExists(interaction) {
-    return this.commandCollection.get(interaction.commandName);
-  }
-
   async doCommand(interaction) {
-    const command = this.isCommandExists(interaction);
+    const command = this.commandCollection.get(interaction.commandName);
     if (!command) {
       await interaction.reply({ content: 'This command does not exist!', ephemeral: true });
       return;
