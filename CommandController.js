@@ -4,7 +4,7 @@ const { REST } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
 const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
-
+const Playlist = require('./Playlist');
 class CommandController {
   constructor() {
     this.commandCollection = new Map();
@@ -47,8 +47,9 @@ class CommandController {
       guildId: interaction.guildId,
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
-    this.player = createAudioPlayer();
-    this.connection.subscribe(this.player);
+    const player = createAudioPlayer();
+    this.connection.subscribe(player);
+    this.Playlist = new Playlist(player);
     console.log('Bot is online!');
   }
 
@@ -59,7 +60,7 @@ class CommandController {
       return;
     }
     try {
-      await command.execute({ interaction, player: this.player });
+      await command.execute({ interaction, playlist: this.Playlist});
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

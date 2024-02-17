@@ -1,9 +1,9 @@
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType,
 } = require('discord.js');
-const ytdl = require('ytdl-core');
+// const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
-const { joinVoiceChannel, createAudioResource, createAudioPlayer } = require('@discordjs/voice');
+const Song = require('../Song');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -13,9 +13,9 @@ module.exports = {
       .setName('song')
       .setDescription('The name of the song to play.')
       .setRequired(true)),
-  execute: async ({ interaction, player }) => {
+  execute: async ({ interaction, playlist }) => {
     const songName = interaction.options.getString('song');
-
+    const member = await interaction.guild.members.fetch(interaction.user.id);
     if (!songName) {
       interaction.reply({ content: 'Please provide a song name.', ephemeral: true });
       return;
@@ -43,11 +43,15 @@ module.exports = {
       });
       collector.on('collect', (buttonInteraction) => {
         const index = parseInt(buttonInteraction.customId.split('_')[1]);
-        const songUrl = `https://www.youtube.com/watch?v=${topResults[index].id}`;
-        const stream = ytdl(songUrl, { quality: 'highestaudio', format: 'audioonly' });
-        const resource = createAudioResource(stream);
-        player.play(resource);
-        buttonInteraction.reply(`Now playing: **${topResults[index].title}**`);
+        const url = `https://www.youtube.com/watch?v=${topResults[index].id}`;
+        const title = topResults[index].title;
+        const songId = topResults[index].id;
+        const thumbnail = topResults[index].thumbnail;
+        const duration = topResults[index].length;
+        const requestedBy = member.user.username;
+        const newSong = new Song({title, url, thumbnail, duration, requestedBy, songId,priority: 0 });
+        playlist.addTrack(newSong);
+        buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
       });
     } catch (error) {
       console.error('Error playing song:', error);

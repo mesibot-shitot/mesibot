@@ -1,9 +1,21 @@
 const PriorityQueue = require('priorityqueuejs');
 
 class Playlist {
-  constructor() {
+  constructor(player) {
     this.queue = new PriorityQueue((songA, songB) => songA.priority - songB.priority);
     this.playedList = [];
+    this.player = player;
+    this.current = null;
+    this.player.on('idle', () => {
+      this.playSong();
+    });
+    this.player.on('paused', () => {
+      this.player.playing = false;
+    });
+    this.player.on('playing', () => {
+      this.player.playing = true;
+    });
+
   }
 
   // adds a song to the queue
@@ -11,10 +23,21 @@ class Playlist {
     this.queue.enq(song);
   }
 
-  // removes a song from the queue
-  removeTrack(song) {
-    this.queue = this.queue.filter((track) => track !== song);
+  // plays the next song in the queue
+  playSong() {
+    if (this.current?.getPlayed()) {
+      this.player.unpause();
+      return;
+    }
+    if (this.queue.isEmpty()) return;
+    this.current = this.queue.deq();
+    this.player.play(this.current.getResource());
+    this.current.Played = true;
+    this.playedList.push(this.current);
+    this.player.playing = true;
+
   }
+
 
   // returns the first 10 songs in the queue
   getQueue() {
@@ -31,3 +54,5 @@ class Playlist {
     this.queue = [];
   }
 }
+
+module.exports = Playlist;

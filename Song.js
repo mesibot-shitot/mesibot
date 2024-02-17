@@ -1,6 +1,9 @@
+const ytdl = require('ytdl-core');
+const {createAudioResource} = require("@discordjs/voice");
+
 class Song {
   constructor({
-    title, url, thumbnail, duration, requestedBy, priority, songId,
+    title, url, thumbnail, duration, requestedBy, songId, priority = 0
   }) {
     this.songId = songId;
     this.priority = priority;
@@ -11,4 +14,13 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
   }
+  getResource() {
+    const stream = ytdl(this.url, { quality: 'highestaudio', format: 'audioonly' });
+    return createAudioResource(stream);
+  }
+    getPlayed() {
+        return this.Played;
+    }
 }
+
+module.exports = Song;
