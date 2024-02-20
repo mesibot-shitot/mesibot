@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
 const Playlist = require('./Playlist');
+
 class CommandController {
   constructor() {
     this.commandCollection = new Map();
@@ -60,7 +61,7 @@ class CommandController {
       return;
     }
     try {
-      await command.execute({ interaction, playlist: this.Playlist});
+      await command.execute({ interaction, playlist: this.Playlist });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

@@ -7,7 +7,6 @@ class Playlist {
     this.player = player;
     this.current = null;
     this.player.on('idle', () => {
-      this.current = undefined;
       this.playSong();
     });
     this.player.on('paused', () => {
