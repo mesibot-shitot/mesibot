@@ -7,6 +7,7 @@ class Playlist {
     this.player = player;
     this.current = null;
     this.player.on('idle', () => {
+      this.current = undefined;
       this.playSong();
     });
     this.player.on('paused', () => {
@@ -15,7 +16,6 @@ class Playlist {
     this.player.on('playing', () => {
       this.player.playing = true;
     });
-
   }
 
   // adds a song to the queue
@@ -35,9 +35,7 @@ class Playlist {
     this.current.Played = true;
     this.playedList.push(this.current);
     this.player.playing = true;
-
   }
-
 
   // returns the first 10 songs in the queue
   getQueue() {

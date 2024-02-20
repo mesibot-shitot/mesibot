@@ -15,6 +15,11 @@ module.exports = {
       index += 1;
       songList.push(newSong);
     }
+    // todo change setTitle to "currently playing"
+    // todo change description to current song in playlist
+    // todo add an if in case the current song is NULL so it will display the first song in the list
+    // todo add a case for when the queue is empty
+    // todo add every song as a link in the embed (for voting system)
     const embed = new EmbedBuilder();
     embed.setTitle('Queue');
     embed.setColor('#ff0000');
