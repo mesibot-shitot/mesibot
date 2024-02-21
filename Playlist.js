@@ -51,6 +51,14 @@ class Playlist {
   destroy() {
     this.queue = [];
   }
+
+  reorderQueue() {
+    const newQueue = new PriorityQueue((songA, songB) => songA.priority - songB.priority);
+    while (!this.queue.isEmpty()) {
+      newQueue.enq(this.queue.deq());
+    }
+    this.queue = newQueue;
+  }
 }
 
 module.exports = Playlist;
