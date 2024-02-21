@@ -11,17 +11,31 @@ module.exports = {
     const songList = [];
     let index = 1;
     for (const song in queue) {
+      if (playlist.current == null && song == 0) { continue; }
       const newSong = { name: `${index}`, value: `${queue[song].title}`, inline: false };
       index += 1;
       songList.push(newSong);
     }
+    // todo add every song as a link in the embed (for voting system)
     const embed = new EmbedBuilder();
-    embed.setTitle('Queue');
-    embed.setColor('#ff0000');
+    if (playlist.queue.size() === 0) {
+      // interaction.reply('The queue is empty');
+      embed.setTitle('The queue is empty');
+      embed.setColor('#ff0000');
+      interaction.reply({ embeds: [embed] });
+      return;
+    }
+    embed.setTitle('currently playing');
+    embed.setColor('#9747FF');
     embed.addFields(songList);
     embed.setTimestamp();
-    embed.setDescription(queue[0].title);
-    embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
+    if (playlist.current != null) {
+      embed.setDescription(playlist.current.title);
+      embed.setThumbnail(playlist.current.thumbnail.thumbnails[0].url);
+    } else {
+      embed.setDescription(queue[0].title);
+      embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
+    }
     interaction.reply({ embeds: [embed] });
   },
 };
