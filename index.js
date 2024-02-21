@@ -1,54 +1,43 @@
-require('dotenv');
-const { Client, GatewayIntentBits } = require("discord.js");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } =  require("@discordjs/voice");
-const ytdl = require("ytdl-core");
-const { GetListByKeyword } = require("youtube-search-api");
+require('dotenv').config();
+const {
+  Client, GatewayIntentBits, Collection, REST,
+} = require('discord.js');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
+const { GetListByKeyword } = require('youtube-search-api');
+const { Routes } = require('discord-api-types/v9');
+const CommandController = require('./CommandController');
 
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.MessageContent
-    ]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent,
+  ],
 });
-
+const controller = new CommandController();
 const token = process.env.MESIBOT_TOKEN;
-
-client.once("ready", () => {
-    console.log("Bot is online!");
+client.commands = new Collection();
+client.once('ready', () => {
+  controller.reloadCommands();
 });
-
-client.on("messageCreate", async (message) => {
-    console.log({ message });
-    if (message.author.bot || !message.guildId) return;
-    if (!message.content.startsWith("mesi play")) return; //todo insert commands router here
-
-    const args = message.content.split(" ").slice(2); // get song name from message
-    if (!args.length) return message.reply("Please provide a song name.");
-
-    const songInfo = await GetListByKeyword(args.join(" "), false);
-    if (!songInfo || songInfo.items.length === 0) return message.reply("Song not found.");
-
-    const songUrl = `https://www.youtube.com/watch?v=${songInfo.items[0].id}`;
-
-        const channel = message.member.voice.channel;
-    if (!channel) return message.reply("You need to be in a voice channel.");
-
-    const connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: message.guildId,
-        adapterCreator: message.guild.voiceAdapterCreator
-    });
-
-    const stream = ytdl(songUrl, { quality: 'highestaudio', format: 'audioonly' });
-    const resource = createAudioResource(stream);
-    const player = createAudioPlayer();
-
-    player.play(resource);
-    connection.subscribe(player);
-
-    await message.reply(`Now playing: **${songInfo.items[0].title}**`);
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+  const { channel } = interaction.member.voice;
+  if (!channel) {
+    interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
+    return;
+  }
+  if (!controller.connection) {
+    controller.createConnection(interaction);
+  }
+  try {
+    await controller.doCommand(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+  }
 });
 
 client.login(token);
