@@ -2,6 +2,10 @@ const ytdl = require('ytdl-core');
 const { createAudioResource } = require("@discordjs/voice");
 const user = require('./user');
 
+const VOTE = {
+  'UP': 1,
+  'DOWN': -1
+}
 class Song {
   constructor({
     title, url, thumbnail, duration, requestedBy, songId, priority = 0
@@ -24,32 +28,34 @@ class Song {
     return this.Played;
   }
 
-  getUserVote(username) {
-    return this.vote.find(vote => vote.user.id === username.id); //todo: doubled user class
+  getUserVote(userID) {
+    return this.vote.find(vote => vote.user === userID); //todo: doubled user class
   }
 
-  recalculatePriority() { //todo: implement recalculatePriority, Add statistical priority
-    const upvotes = this.vote.filter(vote => vote.vote === TRUE).length;
-    const downvotes = this.vote.filter(vote => vote.vote === FALSE).length;
-    this.priority = upvotes - downvotes;
-  }
+  // recalculatePriority(vote) { //todo: implement recalculatePriority, Add statistical priority
+  //   this.priority += vote;
+  // }
 
   setVote(interaction) {
-    // if (username.id === ) return;
-    const existingUser = this.getUserVote();
-  
+
+    const existingUser = this.getUserVote(interaction.user.id);
+    const voteExtract = interaction.options.getString('vote');
+    const newVote = VOTE[voteExtract];
     if (existingUser) {
-      if (existingUser.vote === vote) {
-        interaction.reply('You already voted for this song');
+      if (existingUser.vote === newVote) {
+        interaction.reply({ content: 'You already voted for this song', ephemeral: true }); // todo pop user out of vote list as if he never voted
         return;
       }
-      existingUser.vote = vote;
-      this.recalculatePriority();
+      existingUser.vote = newVote;
+      interaction.reply({ content: 'You have changed your vote', ephemeral: true });
+      this.priority += newVote;
       return;
     }
-    const newUser = { user: interaction.user.id, vote: interaction.customId === 'upvote' ? TRUE : FALSE}; // todo: check if this is the right way to get the user id
+    const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
     this.vote.push(newUser);
-    this.recalculatePriority();
+
+    interaction.reply({ content: 'Vote registered', ephemeral: true });
+    this.priority += newVote;
 
   }
 }

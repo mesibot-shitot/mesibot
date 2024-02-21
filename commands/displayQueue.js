@@ -11,14 +11,14 @@ module.exports = {
     const songList = [];
     let index = 1;
     for (const song in queue) {
-      if (playlist.current == null && song == 0) { continue; }
-      const newSong = { name: `${index}`, value: `${queue[song].title}`, inline: false };
+      // if (playlist.current == null && song == 0) { continue; }
+      const newSong = { name: `${index}) priority: ${queue[song].priority}`, value: `${queue[song].title}`, inline: false };
       index += 1;
       songList.push(newSong);
     }
     // todo add every song as a link in the embed (for voting system)
     const embed = new EmbedBuilder();
-    if (playlist.queue.size() === 0) {
+    if (playlist.queue.size() === 0 &&playlist.current ==null) {
       // interaction.reply('The queue is empty');
       embed.setTitle('The queue is empty');
       embed.setColor('#ff0000');
