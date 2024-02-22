@@ -1,5 +1,5 @@
-const { createAudioResource } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const { createAudioResource } = require("@discordjs/voice");
 const user = require('./user');
 
 const VOTE = {
@@ -8,7 +8,7 @@ const VOTE = {
 };
 class Song {
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
+    title, url, thumbnail, duration, requestedBy, songId, priority = 0
   }) {
     this.songId = songId;
     this.priority = priority;
