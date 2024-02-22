@@ -29,6 +29,10 @@ class Playlist {
       this.player.unpause();
       return;
     }
+    this.skip();
+  }
+
+  skip() {
     if (this.queue.isEmpty()) return;
     this.current = this.queue.deq();
     this.player.play(this.current.getResource());

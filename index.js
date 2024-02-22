@@ -16,6 +16,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+console.log(client);
 const controller = new CommandController();
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
