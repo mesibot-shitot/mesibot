@@ -7,6 +7,7 @@ class Playlist {
     this.player = player;
     this.current = null;
     this.player.on('idle', () => {
+      this.player.playing = false;
       this.current = undefined;
       this.playSong();
     });
@@ -15,6 +16,9 @@ class Playlist {
     });
     this.player.on('playing', () => {
       this.player.playing = true;
+    });
+    this.player.on('error', (error) => {
+      console.error('Error in this.player: there was an error playing the song, skipping.');
     });
   }
 
@@ -29,6 +33,10 @@ class Playlist {
       this.player.unpause();
       return;
     }
+    this.skip();
+  }
+
+  skip() {
     if (this.queue.isEmpty()) return;
     this.current = this.queue.deq();
     this.player.play(this.current.getResource());

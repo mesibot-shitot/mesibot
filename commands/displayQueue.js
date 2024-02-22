@@ -17,7 +17,7 @@ module.exports = {
     }
     // todo add every song as a link in the embed (for voting system)
     const embed = new EmbedBuilder();
-    if (playlist.queue.size() === 0 &&playlist.current ==null) {
+    if (playlist.queue.size() === 0 && playlist.current == null) {
       // interaction.reply('The queue is empty');
       embed.setTitle('The queue is empty');
       embed.setColor('#ff0000');
