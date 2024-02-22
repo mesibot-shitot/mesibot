@@ -18,7 +18,7 @@ class Playlist {
       this.player.playing = true;
     });
     this.player.on('error', (error) => {
-      console.error('Error in this.player: there was an error playing the song, skipping.');
+      console.error('Error in this.player: there was an error playing the song, skipping.', error);
     });
   }
 
