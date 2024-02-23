@@ -1,5 +1,5 @@
 const ytdl = require('ytdl-core');
-const { createAudioResource } = require("@discordjs/voice");
+const { createAudioResource } = require('@discordjs/voice');
 const user = require('./user');
 
 const VOTE = {
@@ -8,7 +8,7 @@ const VOTE = {
 };
 class Song {
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, priority = 0
+    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
   }) {
     this.songId = songId;
     this.priority = priority;
@@ -22,6 +22,7 @@ class Song {
   }
 
   getResource() {
+    ytdl.getInfo(this.url).then(console.log).catch(console.error);
     const stream = ytdl(this.url, { quality: 'lowest', format: 'audioonly' });
     return createAudioResource(stream);
   }

@@ -44,6 +44,7 @@ module.exports = {
       collector.on('collect', (buttonInteraction) => {
         const index = parseInt(buttonInteraction.customId.split('_')[1], 10);
         const url = `https://www.youtube.com/watch?v=${topResults[index].id}`;
+        // console.log(url);
         const { title } = topResults[index];
         const songId = topResults[index].id;
         const { thumbnail } = topResults[index];
