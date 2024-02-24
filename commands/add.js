@@ -1,5 +1,5 @@
 const {
-  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType,
+  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
 } = require('discord.js');
 // const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
@@ -42,14 +42,22 @@ module.exports = {
         time: 15000,
       });
       collector.on('collect', (buttonInteraction) => {
+        if (playlist.queue.size() === 20) {
+          const embed = new EmbedBuilder();
+          embed.setTitle('Playlist is full, songs cannot be added');
+          buttonInteraction.reply({ embeds: [embed] });
+          return;
+        }
         const index = parseInt(buttonInteraction.customId.split('_')[1]);
         const url = `https://www.youtube.com/watch?v=${topResults[index].id}`;
-        const title = topResults[index].title;
+        const { title } = topResults[index];
         const songId = topResults[index].id;
-        const thumbnail = topResults[index].thumbnail;
+        const { thumbnail } = topResults[index];
         const duration = topResults[index].length;
         const requestedBy = member.user.username;
-        const newSong = new Song({title, url, thumbnail, duration, requestedBy, songId,priority: 0 });
+        const newSong = new Song({
+          title, url, thumbnail, duration, requestedBy, songId, priority: 0,
+        });
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
       });
