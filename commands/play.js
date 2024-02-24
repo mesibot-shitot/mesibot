@@ -11,11 +11,16 @@ module.exports = {
       await interaction.reply('you must be in a voice channel to use this command.');
       return;
     }
-
-    if (!playlist.player.playing) await playlist.playSong();
-
-    await interaction.reply({
-      content: `playing ${playlist.current.title}`,
-    });
+    try {
+      if (!playlist.player.playing) await playlist.playSong();
+      await interaction.reply({
+        content: `playing ${playlist.current.title}`,
+      });
+    } catch (err) {
+      const enmbed = new EmbedBuilder();
+      enmbed.setTitle('THERE WAS A COMPILATION TRYING TO PLAY THE SONG');
+      enmbed.setColor('#ff0000');
+      enmbed.setDescription('Skiping the song');
+    }
   },
 };

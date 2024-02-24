@@ -48,7 +48,7 @@ module.exports = {
           buttonInteraction.reply({ embeds: [embed] });
           return;
         }
-        const index = parseInt(buttonInteraction.customId.split('_')[1]);
+        const index = parseInt(buttonInteraction.customId.split('_')[1], 10);
         const url = `https://www.youtube.com/watch?v=${topResults[index].id}`;
         const { title } = topResults[index];
         const songId = topResults[index].id;
