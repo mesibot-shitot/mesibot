@@ -1,4 +1,6 @@
 require('dotenv').config();
+const {MongoStorage} = require('./mongoConnection');
+
 const {
   Client, GatewayIntentBits, Collection, REST,
 } = require('discord.js');
@@ -17,6 +19,7 @@ const client = new Client({
   ],
 });
 const controller = new CommandController();
+
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
 client.once('ready', () => {
@@ -41,3 +44,4 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(token);
+
