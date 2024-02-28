@@ -55,8 +55,9 @@ module.exports = {
         const { thumbnail } = topResults[index];
         const duration = topResults[index].length;
         const requestedBy = member.user.username;
+        const place = playlist.queue.size() + playlist.playedList.length;
         const newSong = new Song({
-          title, url, thumbnail, duration, requestedBy, songId, priority: 0,
+          title, url, thumbnail, duration, requestedBy, songId, place, priority: 0,
         });
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);

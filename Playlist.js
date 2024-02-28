@@ -2,7 +2,11 @@ const PriorityQueue = require('priorityqueuejs');
 
 class Playlist {
   constructor(player) {
-    this.queue = new PriorityQueue((songA, songB) => songA.priority - songB.priority);
+    this.queue = new PriorityQueue((songA, songB) => {
+      const sum = songA.priority - songB.priority;
+      if (!sum) return songB.place - songA.place;// FIXME
+      return sum;
+    });
     this.playedList = [];
     this.player = player;
     this.current = null;
@@ -40,7 +44,9 @@ class Playlist {
     if (this.queue.isEmpty()) {
       return;
     }
+    console.log(`b4 ${this.queue._elements[0].title}`);
     this.current = this.queue.deq();
+    console.log(`after ${this.queue._elements[0].title}`);
     this.player.play(this.current.getResource());
     this.current.Played = true;
     this.playedList.push(this.current);

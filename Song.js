@@ -8,7 +8,7 @@ const VOTE = {
 };
 class Song {
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
+    title, url, thumbnail, duration, requestedBy, songId, place, priority = 0,
   }) {
     this.songId = songId;
     this.priority = priority;
@@ -19,6 +19,7 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
+    this.place = place;
   }
 
   getResource() {
@@ -49,7 +50,7 @@ class Song {
       }
       existingUser.vote = newVote;
       interaction.reply({ content: 'You have changed your vote', ephemeral: true });
-      this.priority += newVote;
+      this.priority += (newVote * 2);
       return;
     }
     const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id

@@ -11,7 +11,9 @@ module.exports = {
     const songList = [];
     let index = 1;
     for (const song in queue) {
-      const newSong = { name: `${index}) added by: ${queue[song].requestedBy}`, value: `${queue[song].title}`, inline: false };
+      const newSong = {
+        name: `${index}) added by: ${queue[song].requestedBy} priority:  ${queue[song].priority} place: ${queue[song].place}`, value: `${queue[song].title}`, inline: false,
+      };
       index += 1;
       songList.push(newSong);
     }
