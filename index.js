@@ -7,6 +7,7 @@ const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
 const { Routes } = require('discord-api-types/v9');
 const CommandController = require('./CommandController');
+const ConnectionManager = require('./connections/ConnectionManager');
 
 const client = new Client({
   intents: [
@@ -16,7 +17,9 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+
 const controller = new CommandController();
+const connectionManager = new ConnectionManager();
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
 client.once('ready', () => {

@@ -1,6 +1,6 @@
 const ytdl = require('ytdl-core');
 const { createAudioResource } = require('@discordjs/voice');
-const user = require('./user');
+const user = require('./User');
 
 const VOTE = {
   UP: 1,
