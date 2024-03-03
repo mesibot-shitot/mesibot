@@ -18,7 +18,7 @@ module.exports = {
       });
     } catch (err) {
       const enmbed = new EmbedBuilder();
-      enmbed.setTitle('THERE WAS A COMPILATION TRYING TO PLAY THE SONG');
+      enmbed.setTitle('THERE WAS A COMPLICATION TRYING TO PLAY THE SONG');
       enmbed.setColor('#ff0000');
       enmbed.setDescription('Skiping the song');
     }
