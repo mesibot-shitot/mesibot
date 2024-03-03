@@ -61,6 +61,7 @@ module.exports = {
         });
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
+        playlist.reorderQueue();
       });
     } catch (error) {
       console.error('Error playing song:', error);
