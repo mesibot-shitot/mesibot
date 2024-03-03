@@ -1,10 +1,8 @@
 const {MongoStorage} = require('./mongoConnection');
 
-class repositorys {
+class PlaylistRepository {
     constructor() {
-      this.songStorage = new MongoStorage('song');
       this.playlistStorage = new MongoStorage('playlist'); 
-      this.userStorage = new MongoStorage('user');
     }
 
     findSongs() {
@@ -79,4 +77,4 @@ class repositorys {
         return this.userStorage.userExist({ userID: User });
     }
   }
-module.exports = repositorys;
+module.exports = PlaylistRepository;
