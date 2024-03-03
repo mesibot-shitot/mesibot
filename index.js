@@ -1,5 +1,4 @@
 require('dotenv').config();
-const {MongoStorage} = require('./mongoConnection');
 
 const {
   Client, GatewayIntentBits, Collection, REST,
