@@ -11,7 +11,9 @@ module.exports = {
     const songList = [];
     let index = 1;
     for (const song in queue) {
-      const newSong = { name: `${index}) added by: ${queue[song].requestedBy}`, value: `${queue[song].title}`, inline: false };
+      const newSong = {
+        name: `${index}) added by: ${queue[song].requestedBy} priority:  ${queue[song].priority} place: ${queue[song].place}`, value: `${queue[song].title}`, inline: false,
+      };
       index += 1;
       songList.push(newSong);
     }
@@ -34,11 +36,11 @@ module.exports = {
         embed.setTitle('Currently paused:');
       }
       embed.setDescription(playlist.current.title);
-      embed.setThumbnail(playlist.current.thumbnail.thumbnails[0].url);
+      embed.setThumbnail(playlist.current.thumbnail);
     } else {
       embed.setTitle('Playing next:');
       embed.setDescription(queue[0].title);
-      embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
+      embed.setThumbnail(queue[0].thumbnail);
     }
     interaction.reply({ embeds: [embed] });
   },

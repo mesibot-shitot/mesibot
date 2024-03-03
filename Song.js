@@ -8,7 +8,7 @@ const VOTE = {
 };
 class Song {
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
+    title, url, thumbnail, duration, requestedBy, songId, place, priority = 0,
   }) {
     this.songId = songId;
     this.priority = priority;
@@ -19,11 +19,11 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
+    this.place = place;
   }
 
   getResource() {
-    ytdl.getInfo(this.url).then(console.log).catch(console.error);
-    const stream = ytdl(this.url, { quality: 'lowest', format: 'audioonly' });
+    const stream = ytdl(this.url, { quality: 'lowestaudio', format: 'audioonly' });
     return createAudioResource(stream);
   }
 
@@ -50,7 +50,7 @@ class Song {
       }
       existingUser.vote = newVote;
       interaction.reply({ content: 'You have changed your vote', ephemeral: true });
-      this.priority += newVote;
+      this.priority += (newVote * 2);
       return;
     }
     const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id

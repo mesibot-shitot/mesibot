@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const Path = require('path');
 const { config } = require('dotenv');
-const Song = require("./Song");
+const Song = require("../Song");
 
 
 class SongStorage {
     constructor(entity) {
-        this.entityName = entity.charAt(0).tolowerCase() + entity.slice(1);
-        this.Model = require(Path.join(__dirname, `./models/${this.entityName}.model.js`));
+        this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
+        this.Model = require(Path.join(__dirname, `../models/${this.entityName}.model.js`));
         this.connect();
     }   
 

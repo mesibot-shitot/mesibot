@@ -1,8 +1,8 @@
-const {MongoStorage} = require('./songConnection');
+const {SongStorage} = require('../mongoConnection/songConnection');
 
 class SongRepository {
     constructor() {
-      this.songStorage = new MongoStorage('song');
+      this.songStorage = new SongStorage('song');
     }
 
     findSongs() {

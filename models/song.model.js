@@ -1,9 +1,8 @@
 const { Schema, model } = require('mongoose');
 
 const songSchema = new Schema({
-    songId: { type: Number, unique: true },
+    songId: { type: String, unique: true },
     name: { type: String },
-    desc: { type: String },
     priority: { type: Number },
     url: { type: String },
     thumbnail: { type: String },

@@ -21,9 +21,12 @@ const controller = new CommandController();
 
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
+/// ////
+// client.channelsCache = new Map();
 client.once('ready', () => {
   controller.reloadCommands();
 });
+
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
   const { channel } = interaction.member.voice;
@@ -34,6 +37,8 @@ client.on('interactionCreate', async (interaction) => {
   if (!controller.connection) {
     controller.createConnection(interaction);
   }
+  /// ///////
+  // client.channelsCache.set(interaction.user.id, channel);
   try {
     await controller.doCommand(interaction);
   } catch (error) {
