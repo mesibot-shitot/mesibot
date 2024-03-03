@@ -45,10 +45,8 @@ class Playlist {
     if (this.queue.isEmpty()) {
       return;
     }
-    console.log(`b4 ${this.queue._elements[0].title}`);
     this.current = this.queue.deq();
     this.reorderQueue();
-    console.log(`after ${this.queue._elements[0].title}`);
     this.player.play(this.current.getResource());
     this.current.Played = true;
     this.playedList.push(this.current);

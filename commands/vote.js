@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const Playlist = require('../Playlist');
+const displayqueue = require('./displayqueue');
 
 module.exports = {
   data: new SlashCommandBuilder()
