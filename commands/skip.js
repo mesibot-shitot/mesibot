@@ -17,6 +17,7 @@ module.exports = {
       interaction.reply({ embeds: [embed] });
       return;
     }
+
     playlist.skip();
     embed.setTitle('skipped');
     embed.setDescription(`now playing **${playlist.current.title}**`);

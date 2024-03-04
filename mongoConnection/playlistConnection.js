@@ -1,49 +1,38 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Path = require('path');
 const { config } = require('dotenv');
-const Playlist = require("../Playlist");
+const Playlist = require('../Playlist');
 
 class playlistStorage {
-    constructor(entity) {
-        this.entityName = entity.charAt(0).tolowerCase() + entity.slice(1);
-        this.Model = require(Path.join(__dirname, `./models/${this.entityName}.model.js`));
-        this.connect();
-    }   
+  constructor(entity) {
+    this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
+    this.Model = require(Path.join(__dirname, `./models/${this.entityName}.model.js`));
+    this.connect();
+  }
 
-    connect() {
-        const connectionUri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}`;
-        mongoose
-            .connect(connectionUri)
-            .then(() => {
-                console.log('Connected to the database');
-            })
-            .catch((error) => {
-                console.error('Error connecting to the database', error);
-            });
-    }
-getPlaylists = () => {
-    return this.Model.findPlaylist();
-}
+  connect() {
+    const connectionUri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}`;
+    mongoose
+      .connect(connectionUri)
+      .then(() => {
+        console.log('Connected to the database');
+      })
+      .catch((error) => {
+        console.error('Error connecting to the database', error);
+      });
+  }
 
-getPlaylistId = (playlistId) => {
-    return this.Model.find({ id: playlistId });
-}
+  getPlaylists = () => this.Model.findPlaylist();
 
-createPlaylist = (Playlist) => {
-    return this.Model.create(Playlist);
-}
+  getPlaylistId = (playlistId) => this.Model.find({ id: playlistId });
 
-updatePlaylist = (playlistId, Playlist) => {
-    return this.Model.updateOne({ playlistId }, Playlist);
-}
+  createPlaylist = (Playlist) => this.Model.create(Playlist);
 
-deletePlaylist = (playlistId) => {
-    return this.Model.deleteOne({ playlistId: Playlist });
-}
+  updatePlaylist = (playlistId, Playlist) => this.Model.updateOne({ playlistId }, Playlist);
 
-existPlaylist = (playlistID) => {
-    return this.Model.exists({ playlistID: Playlist });
-}
+  deletePlaylist = (playlistId) => this.Model.deleteOne({ playlistId: Playlist });
+
+  existPlaylist = (playlistID) => this.Model.exists({ playlistID: Playlist });
 }
 
 module.exports = { playlistStorage };

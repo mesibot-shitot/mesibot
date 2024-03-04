@@ -42,6 +42,11 @@ client.on('interactionCreate', async (interaction) => {
     return;
   }
   if (!controller.connection) {
+    const owner = await interaction.guild.fetchOwner();
+    if (owner.id !== interaction.user.id) {
+      interaction.reply({ content: 'You must be a group creator to create a connection', ephemeral: true });
+      return;
+    }
     controller.createConnection(interaction);
   }
   /// ///////
