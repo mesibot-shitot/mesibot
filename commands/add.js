@@ -1,4 +1,3 @@
-
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
 } = require('discord.js');
@@ -22,20 +21,18 @@ module.exports = {
       return;
     }
     try {
-      const songInfo = await GetListByKeyword(songName, false);
+      const songInfo = await GetListByKeyword(`${songName} lyrics`, false);
       if (!songInfo || songInfo.items.length === 0) {
         interaction.reply({ content: 'Song not found.', ephemeral: true });
         return;
       }
       const topResults = songInfo.items.slice(0, 5);
 
-      // Create buttons for each result
       const buttons = topResults.map((item, index) => new ButtonBuilder()
         .setLabel(`${item.title.split(' ').slice(0, 7).join(' ')}...`)
         .setStyle(ButtonStyle.Primary)
         .setCustomId(`song_${index}`));
 
-      // Create action row with buttons
       const row = new ActionRowBuilder().addComponents(buttons);
       const userChoice = await interaction.reply({ content: 'Please select a song:', components: [row], ephemeral: true });
       const collector = userChoice.createMessageComponentCollector({

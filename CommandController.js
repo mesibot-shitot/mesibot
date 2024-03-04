@@ -57,6 +57,7 @@ class CommandController {
   async doCommand(interaction) {
     const command = this.commandCollection.get(interaction.commandName);
     if (!command) {
+      console.log(this.commandCollection.keys());
       await interaction.reply({ content: 'This command does not exist!', ephemeral: true });
       return;
     }

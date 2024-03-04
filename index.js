@@ -25,11 +25,9 @@ const client = new Client({
 });
 
 const controller = new CommandController();
-const connectionManager = new ConnectionManager();
+const connectionManager = new ConnectionManager(); // todo manager
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
-/// ////
-// client.channelsCache = new Map();
 client.once('ready', () => {
   controller.reloadCommands();
 });
@@ -49,8 +47,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     controller.createConnection(interaction);
   }
-  /// ///////
-  // client.channelsCache.set(interaction.user.id, channel);
+
   try {
     await controller.doCommand(interaction);
   } catch (error) {
