@@ -1,3 +1,4 @@
+
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
 } = require('discord.js');
@@ -53,12 +54,13 @@ module.exports = {
         const { title } = topResults[index];
         const songId = topResults[index].id;
         const { thumbnail } = topResults[index];
-        const duration = topResults[index].length;
+        const duration = topResults[index].length.simpleText;
         const requestedBy = member.user.username;
         const place = playlist.queue.size() + playlist.playedList.length;
         const newSong = new Song({
-          title, url, thumbnail, duration, requestedBy, songId, place, priority: 0,
+          title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, place, priority: 0,
         });
+        console.log(topResults[0]);
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();

@@ -36,11 +36,11 @@ module.exports = {
         embed.setTitle('Currently paused:');
       }
       embed.setDescription(playlist.current.title);
-      embed.setThumbnail(playlist.current.thumbnail.thumbnails[0].url);
+      embed.setThumbnail(playlist.current.thumbnail);
     } else {
       embed.setTitle('Playing next:');
       embed.setDescription(queue[0].title);
-      embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
+      embed.setThumbnail(queue[0].thumbnail);
     }
     interaction.reply({ embeds: [embed] });
   },
