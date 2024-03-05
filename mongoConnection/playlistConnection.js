@@ -5,8 +5,8 @@ const Playlist = require("../Playlist");
 
 class playlistStorage {
     constructor(entity) {
-        this.entityName = entity.charAt(0).tolowerCase() + entity.slice(1);
-        this.Model = require(Path.join(__dirname, `./models/${this.entityName}.model.js`));
+        this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
+        this.Model = require(Path.join(__dirname, `../models/${this.entityName}.model.js`));
         this.connect();
     }   
 
@@ -31,6 +31,10 @@ getPlaylistId = (playlistId) => {
 
 createPlaylist = (Playlist) => {
     return this.Model.create(Playlist);
+}
+
+savePlaylist = (Playlist) => {
+    return this.Model.save(Playlist);
 }
 
 updatePlaylist = (playlistId, Playlist) => {

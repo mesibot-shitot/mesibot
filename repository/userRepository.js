@@ -1,4 +1,4 @@
-const {UserStorage} = require('./userConnection');
+const {UserStorage} = require('../mongoConnection/userConnection');
 
 class UserRepository {
     constructor() {

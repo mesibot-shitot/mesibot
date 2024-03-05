@@ -1,8 +1,8 @@
-const {MongoStorage} = require('./playlistConnection');
+const {PlaylistStorage} = require('../mongoConnection/playlistConnection');
 
 class PlaylistRepository {
     constructor() {
-      this.playlistStorage = new MongoStorage('playlist'); 
+      this.playlistStorage = new PlaylistStorage('playlist'); 
     }
 
     findPlaylists() {
@@ -15,6 +15,10 @@ class PlaylistRepository {
 
     createPlaylist(Playlist) {
         return this.playlistStorage.createPlaylist(Playlist);
+    }
+
+    savePlaylist(Playlist) {
+        return this.playlistStorage.savePlaylist(Playlist);
     }
 
     updatePlaylist(playlistId, Playlist) {

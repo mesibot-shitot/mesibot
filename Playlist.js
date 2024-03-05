@@ -64,6 +64,10 @@ class Playlist {
     return this.queue.slice(0, 10);
   }
 
+  saveQueue() {
+    songDB.saveQueue(this.queue._elements);
+  }
+
   // returns the current song
   getCurrentSong() {
     return this.queue[0];
