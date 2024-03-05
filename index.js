@@ -41,15 +41,10 @@ client.on('interactionCreate', async (interaction) => {
     interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
     return;
   }
-  // if (!getVoiceConnection(interaction.guildId)) {
-  //   const owner = await interaction.guild.fetchOwner();
-  //   if (owner.id !== interaction.user.id) {
-  //     interaction.reply({ content: 'You must be a group creator to create a connection', ephemeral: true });
-  //     return;
-  //   }
-  //   await connectionManager.addConnection(interaction);
-  // }
-
+  if (!connectionManager.findConnection(interaction.guildId) && interaction.commandName !== 'mesi') {
+    interaction.reply({ content: 'You need to connect the bot to a voice channel first.\n**Call mesi over with /mesi**', ephemeral: true });
+    return;
+  }
   try {
     await controller.doCommand(interaction, connectionManager);
   } catch (error) {
