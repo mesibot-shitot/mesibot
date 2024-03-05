@@ -1,36 +1,33 @@
-const {PlaylistStorage} = require('../mongoConnection/playlistConnection');
+const {playlistHandler} = require('../DB/playlistHandler');
 
 class PlaylistRepository {
     constructor() {
-      this.playlistStorage = new PlaylistStorage('playlist'); 
+      this.playlistStorage = new playlistHandler('playlist'); 
     }
 
-    findPlaylists() {
-        return this.playlistStorage.getPlaylists();
-    }
+  fetchGroupPlaylists() {
+    return this.playlistStorage.getPlaylists();
+  }
 
-    getplaylistId(playlistId) {
-        return this.playlistStorage.findPlaylists({ id: playlistId });
-    }
+  getplaylistId(playlistId) {
+    return this.playlistStorage.findPlaylists({ id: playlistId });
+  }
 
     createPlaylist(Playlist) {
         return this.playlistStorage.createPlaylist(Playlist);
     }
 
-    savePlaylist(Playlist) {
-        return this.playlistStorage.savePlaylist(Playlist);
-    }
 
-    updatePlaylist(playlistId, Playlist) {
-        return this.playlistStorage.updatePlaylist({ playlistId }, Playlist);
-    }
-
-    deletePlaylist(playlistId) {
-        return this.playlistStorage.deletePlaylist({ playlistId: Playlist });
-    }
-
-    playlistExist(playlistID) {
-        return this.playlistStorage.playlistExist({ playlistID: Playlist });
-    }
+  updatePlaylist(playlistId, Playlist) {
+    return this.playlistStorage.updatePlaylist({ playlistId }, Playlist);
   }
+
+  deletePlaylist(playlistId) {
+    return this.playlistStorage.deletePlaylist({ playlistId: Playlist });
+  }
+
+  playlistExist(playlistID) {
+    return this.playlistStorage.playlistExist({ playlistID: Playlist });
+  }
+}
 module.exports = PlaylistRepository;

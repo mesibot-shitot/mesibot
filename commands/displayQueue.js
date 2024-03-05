@@ -5,9 +5,9 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('display-queue')
     .setDescription('show the first 10 songs in the queue.'),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     const queue = playlist.queue._elements;
-    console.log(queue);
     const songList = [];
     let index = 1;
     for (const song in queue) {

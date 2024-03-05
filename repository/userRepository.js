@@ -1,8 +1,8 @@
-const {UserStorage} = require('../mongoConnection/userConnection');
+const {userHandler} = require('../DB/userHandler');
 
 class UserRepository {
     constructor() {
-      this.userStorage = new UserStorage('user');
+      this.userStorage = new userHandler('user');
     }
 
     findUsers() {

@@ -1,4 +1,3 @@
-
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
 } = require('discord.js');
@@ -14,7 +13,8 @@ module.exports = {
       .setName('song')
       .setDescription('The name of the song to play.')
       .setRequired(true)),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     const songName = interaction.options.getString('song');
     const member = await interaction.guild.members.fetch(interaction.user.id);
     if (!songName) {
@@ -22,20 +22,18 @@ module.exports = {
       return;
     }
     try {
-      const songInfo = await GetListByKeyword(songName, false);
+      const songInfo = await GetListByKeyword(`${songName} lyrics`, false);
       if (!songInfo || songInfo.items.length === 0) {
         interaction.reply({ content: 'Song not found.', ephemeral: true });
         return;
       }
       const topResults = songInfo.items.slice(0, 5);
 
-      // Create buttons for each result
       const buttons = topResults.map((item, index) => new ButtonBuilder()
         .setLabel(`${item.title.split(' ').slice(0, 7).join(' ')}...`)
         .setStyle(ButtonStyle.Primary)
         .setCustomId(`song_${index}`));
 
-      // Create action row with buttons
       const row = new ActionRowBuilder().addComponents(buttons);
       const userChoice = await interaction.reply({ content: 'Please select a song:', components: [row], ephemeral: true });
       const collector = userChoice.createMessageComponentCollector({
@@ -60,7 +58,6 @@ module.exports = {
         const newSong = new Song({
           title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, place, priority: 0,
         });
-        console.log(topResults[0]);
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();
