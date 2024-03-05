@@ -32,7 +32,6 @@ module.exports = {
     const message = queue[songNum].setVote(interaction);
     const { channel } = interaction.member.voice;
     if ((queue[songNum].disLikeCount()) === Math.ceil(channel.members.size / 2)) {
-      console.log(queue[songNum].disLikeCount());
       const name = queue[songNum].title;
       queue.splice(songNum, 1);
       await interaction.reply(`${name} was removed from queue`);
