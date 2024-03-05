@@ -39,17 +39,5 @@ module.exports = {
       interaction.reply({ content: `${message}`, ephemeral: true });
     }
     playlist.reorderQueue();
-    // try {
-    //   const embed = await displayqueue.execute({ interaction, playlist });
-    //   if (!interaction.replied) {
-    //     await interaction.followUp({ embeds: [embed] });
-    //   } else {
-    //     await interaction.followUp({ embeds: [embed] });
-    //   }
-    //   console.log('Queue reordered and displayed.');
-    // } catch (error) {
-    //   console.error('Error displaying queue:', error);
-    //   await interaction.followUp({ content: 'There was an error displaying the queue.', ephemeral: true });
-    // }
   },
 };
