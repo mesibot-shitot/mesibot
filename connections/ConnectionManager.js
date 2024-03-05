@@ -9,7 +9,7 @@ class ConnectionManager {
     this.connections = [];
   }
 
-  async addConnection(interaction) {
+  async addConnection(interaction, load = false, playlist = null) {
     const { channel } = interaction.member.voice;
     if (!channel) {
       await interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
@@ -19,14 +19,14 @@ class ConnectionManager {
     if (getVoiceConnection(interaction.guildId)) {
       await interaction.reply({ content: 'There is already a connection for this group.', ephemeral: true });
     }
-    const connection = new Connection(interaction);
+    const connection = new Connection(interaction, load, playlist);
     this.connections.push(connection);
 
     //  todo check if connection exists in database
   }
 
-  fetchGroupPlaylists(id) {
-    
+  fetchGroupPlaylists(id) { 
+    return playlistDB.fetchGroupPlaylists(id);
   }
 
 

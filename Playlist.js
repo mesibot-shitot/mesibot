@@ -9,9 +9,9 @@ const comperator = (songA, songB) => {
 
 const songDB = new SongRepository();
 class Playlist {
-  constructor(player, groupID, name = 'default') {
+  name = "default";
+  constructor(player, groupID) {
     this.groupID = groupID;
-    this.name = name;
     this.queue = new PriorityQueue(comperator);
     this.playedList = [];
     this.player = player;
@@ -34,7 +34,12 @@ class Playlist {
 
   // adds a song to the queue
   async addTrack(song) {
+
+    song.place = this.queue.size() + this.playedList.length;
+    console.log(song.place);
     this.queue.enq(song);
+
+    
     // await songDB.createSong(song); // todo: add try catch
   }
 

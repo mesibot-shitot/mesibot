@@ -7,8 +7,9 @@ const VOTE = {
   DOWN: -1,
 };
 class Song {
+  place = -1;
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, place, priority = 0,
+    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
   }) {
     this.songId = songId;
     this.priority = priority;
@@ -19,7 +20,6 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
-    this.place = place;
   }
 
   getResource() {

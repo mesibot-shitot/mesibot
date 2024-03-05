@@ -2,22 +2,22 @@ const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
 const User = require('../User');
 const Playlist = require('../Playlist');
 const PlaylistRepository = require('../repository/playlistRepository');
+const Song = require('../Song');
 
 const playlistDB = new PlaylistRepository();
 class Connection {
-  playlists = [];
 
   playlist = null;
 
   members = []; // todo for statistics
 
-  constructor(interaction) {
+  constructor(interaction, load = false, playlistId = null) {
     this.group = interaction.guildId;
     // this.getMembers(interaction);
-    this.createConnection(interaction);
+    this.createConnection(interaction, load, playlistId);
   }
 
-  createConnection(interaction, load = false, playlist = null) {
+  createConnection(interaction, load = false, playlistId = null) {
     this.connection = joinVoiceChannel({
       channelId: interaction.channel.id,
       guildId: interaction.guildId,
@@ -26,10 +26,11 @@ class Connection {
     const player = createAudioPlayer();
     this.connection.subscribe(player);
     // todo change here when working on loading playlist from DB
-    if (load) {
-      this.playlist = playlist;
-    } else
-    this.playlist = new Playlist(player, interaction.guildId, 'default');
+    this.playlist = new Playlist(player, interaction.guildId);
+    //todo check playlist parameters
+    if (load){
+      this.loadPlaylist(playlistId);
+    }
     console.log(`Bot connected to #${this.group} group!`);
   }
 
@@ -42,10 +43,16 @@ class Connection {
     });
   }
 
-  getPlaylist() {
-
-    // todo get playlists by group from DB
-    playlistDB.findPlaylists(this.group);
+  async loadPlaylist(id) {
+    const imported = await playlistDB.getPlaylistById(id);
+    const importedPlaylist = imported[0];
+    importedPlaylist.queue.forEach((song) => {
+      const { title, url, thumbnail, duration, requestedBy, songId, priority, place } = song;
+      const newSong = new Song( { title, url, thumbnail, duration, requestedBy, songId, priority, place });
+      this.playlist.addTrack(newSong);
+    });
+    this.playlist.playedList = importedPlaylist.playedList;
+    this.playlist.name = importedPlaylist.name;
   }
 
   savePlaylist() {

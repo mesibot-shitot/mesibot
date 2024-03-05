@@ -5,12 +5,13 @@ class PlaylistRepository {
       this.playlistStorage = new playlistHandler('playlist'); 
     }
 
-  fetchGroupPlaylists() {
-    return this.playlistStorage.getPlaylists();
+  fetchGroupPlaylists(id) {
+    return this.playlistStorage.getGroupPlaylists();
+
   }
 
-  getplaylistId(playlistId) {
-    return this.playlistStorage.findPlaylists({ id: playlistId });
+  getPlaylistById(playlistId) {
+    return this.playlistStorage.getPlaylistById(playlistId);
   }
 
     createPlaylist(Playlist) {
