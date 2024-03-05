@@ -42,6 +42,9 @@ module.exports = {
       embed.setDescription(queue[0].title);
       embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
     }
+    // if (interaction.commandName === 'vote') {
+    //   return embed;
+    // }
     interaction.reply({ embeds: [embed] });
   },
 };

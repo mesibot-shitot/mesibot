@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const {
+  MessageActionRow, MessageButton, EmbedBuilder, VoiceChannel,
+} = require('discord.js');
 const Playlist = require('../Playlist');
 const displayqueue = require('./displayqueue');
 
@@ -26,8 +28,28 @@ module.exports = {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
     }
-    queue[songNum].setVote(interaction);
+    const message = queue[songNum].setVote(interaction);
+    const { channel } = interaction.member.voice;
+    if ((queue[songNum].disLikeCount()) === Math.ceil(channel.members.size / 2)) {
+      console.log(queue[songNum].disLikeCount());
+      const name = queue[songNum].title;
+      queue.splice(songNum, 1);
+      await interaction.reply(`${name} was removed from queue`);
+    } else {
+      interaction.reply({ content: `${message}`, ephemeral: true });
+    }
     playlist.reorderQueue();
-    console.log('queue reorderd!');
+    // try {
+    //   const embed = await displayqueue.execute({ interaction, playlist });
+    //   if (!interaction.replied) {
+    //     await interaction.followUp({ embeds: [embed] });
+    //   } else {
+    //     await interaction.followUp({ embeds: [embed] });
+    //   }
+    //   console.log('Queue reordered and displayed.');
+    // } catch (error) {
+    //   console.error('Error displaying queue:', error);
+    //   await interaction.followUp({ content: 'There was an error displaying the queue.', ephemeral: true });
+    // }
   },
 };

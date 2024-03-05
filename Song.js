@@ -38,26 +38,33 @@ class Song {
   // recalculatePriority(vote) { //todo: implement recalculatePriority, Add statistical priority
   //   this.priority += vote;
   // }
+  disLikeCount() {
+    const count = this.vote.filter((vote) => vote.vote === -1);
+    console.log(count.length);
+    return count.length;
+  }
 
   setVote(interaction) {
     const existingUser = this.getUserVote(interaction.user.id);
     const voteExtract = interaction.options.getString('vote');
     const newVote = VOTE[voteExtract];
+    let message;
     if (existingUser) {
       if (existingUser.vote === newVote) {
-        interaction.reply({ content: 'You already voted for this song', ephemeral: true }); // todo pop user out of vote list as if he never voted
-        return;
+        message = 'You already voted for this song'; // todo pop user out of vote list as if he never voted
+        return message;
       }
       existingUser.vote = newVote;
-      interaction.reply({ content: 'You have changed your vote', ephemeral: true });
+      message = 'You have changed your vote';
       this.priority += (newVote * 2);
-      return;
+      return message;
     }
     const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
     this.vote.push(newUser);
 
-    interaction.reply({ content: 'Vote registered', ephemeral: true });
+    message = 'Vote registered';
     this.priority += newVote;
+    return message;
   }
 }
 
