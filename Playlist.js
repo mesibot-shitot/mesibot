@@ -1,12 +1,16 @@
 const PriorityQueue = require('priorityqueuejs');
+const SongRepository = require('./repository/songRepository');
 
 const comperator = (songA, songB) => {
   const sum = songA.priority - songB.priority;
-  if (!sum) return songB.place - songA.place;// FIXME
+  if (!sum) return songB.place - songA.place;
   return sum;
 };
+
+const songDB = new SongRepository();
 class Playlist {
-  constructor(player) {
+  constructor(player, name = 'default') {
+    this.name = name;
     this.queue = new PriorityQueue(comperator);
     this.playedList = [];
     this.player = player;
@@ -28,8 +32,9 @@ class Playlist {
   }
 
   // adds a song to the queue
-  addTrack(song) {
+  async addTrack(song) {
     this.queue.enq(song);
+    // await songDB.createSong(song); // todo: add try catch
   }
 
   // plays the next song in the queue
@@ -53,7 +58,6 @@ class Playlist {
     this.player.playing = true;
   }
 
-  // returns the first 10 songs in the queue
   getQueue() {
     return this.queue.slice(0, 10);
   }

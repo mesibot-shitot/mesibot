@@ -6,7 +6,8 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('play')
     .setDescription('play a song.'),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     if (!interaction.member.voice.channel) {
       await interaction.reply('you must be in a voice channel to use this command.');
       return;

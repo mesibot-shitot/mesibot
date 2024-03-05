@@ -5,9 +5,9 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('display-queue')
     .setDescription('show the first 10 songs in the queue.'),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     const queue = playlist.queue._elements;
-    // console.log(queue);
     const songList = [];
     let index = 1;
     for (const song in queue) {
@@ -36,11 +36,11 @@ module.exports = {
         embed.setTitle('Currently paused:');
       }
       embed.setDescription(playlist.current.title);
-      embed.setThumbnail(playlist.current.thumbnail.thumbnails[0].url);
+      embed.setThumbnail(playlist.current.thumbnail);
     } else {
       embed.setTitle('Playing next:');
       embed.setDescription(queue[0].title);
-      embed.setThumbnail(queue[0].thumbnail.thumbnails[0].url);
+      embed.setThumbnail(queue[0].thumbnail);
     }
     interaction.reply({ embeds: [embed] });
   },

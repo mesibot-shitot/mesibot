@@ -8,11 +8,14 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 const {
   Client, GatewayIntentBits, Collection, REST,
 } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const {
+  joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection,
+} = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
 const { Routes } = require('discord-api-types/v9');
 const CommandController = require('./CommandController');
+const ConnectionManager = require('./connections/ConnectionManager');
 
 const client = new Client({
   intents: [
@@ -22,13 +25,13 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+
 const controller = new CommandController();
+const connectionManager = new ConnectionManager(); // todo manager
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
-/// ////
-// client.channelsCache = new Map();
-client.once('ready', () => {
-  controller.reloadCommands();
+client.once('ready', async () => {
+  await controller.reloadCommands();
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -38,13 +41,12 @@ client.on('interactionCreate', async (interaction) => {
     interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
     return;
   }
-  if (!controller.connection) {
-    controller.createConnection(interaction);
+  if (!connectionManager.findConnection(interaction.guildId) && interaction.commandName !== 'mesi') {
+    interaction.reply({ content: 'You need to connect the bot to a voice channel first.\n**Call mesi over with /mesi**', ephemeral: true });
+    return;
   }
-  /// ///////
-  // client.channelsCache.set(interaction.user.id, channel);
   try {
-    await controller.doCommand(interaction);
+    await controller.doCommand(interaction, connectionManager);
   } catch (error) {
     console.error(error);
     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

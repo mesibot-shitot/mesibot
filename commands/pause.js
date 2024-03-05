@@ -4,7 +4,8 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('pause')
     .setDescription('pauses the current song.'),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     if (!playlist.player.playing) {
       await interaction.reply('there is no song playing.');
       return;
