@@ -13,7 +13,8 @@ module.exports = {
       .setName('song')
       .setDescription('The name of the song to play.')
       .setRequired(true)),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     const songName = interaction.options.getString('song');
     const member = await interaction.guild.members.fetch(interaction.user.id);
     if (!songName) {
@@ -57,7 +58,6 @@ module.exports = {
         const newSong = new Song({
           title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, place, priority: 0,
         });
-        console.log(topResults[0]);
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();

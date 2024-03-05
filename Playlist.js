@@ -3,13 +3,14 @@ const SongRepository = require('./repository/songRepository');
 
 const comperator = (songA, songB) => {
   const sum = songA.priority - songB.priority;
-  if (!sum) return songB.place - songA.place;// FIXME
+  if (!sum) return songB.place - songA.place;
   return sum;
 };
 
 const songDB = new SongRepository();
 class Playlist {
-  constructor(player) {
+  constructor(player, name = 'default') {
+    this.name = name;
     this.queue = new PriorityQueue(comperator);
     this.playedList = [];
     this.player = player;

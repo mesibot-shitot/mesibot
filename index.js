@@ -8,7 +8,9 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 const {
   Client, GatewayIntentBits, Collection, REST,
 } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const {
+  joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection,
+} = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
 const { Routes } = require('discord-api-types/v9');
@@ -28,8 +30,8 @@ const controller = new CommandController();
 const connectionManager = new ConnectionManager(); // todo manager
 const token = process.env.MESIBOT_TOKEN;
 client.commands = new Collection();
-client.once('ready', () => {
-  controller.reloadCommands();
+client.once('ready', async () => {
+  await controller.reloadCommands();
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -39,17 +41,17 @@ client.on('interactionCreate', async (interaction) => {
     interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
     return;
   }
-  if (!controller.connection) {
-    const owner = await interaction.guild.fetchOwner();
-    if (owner.id !== interaction.user.id) {
-      interaction.reply({ content: 'You must be a group creator to create a connection', ephemeral: true });
-      return;
-    }
-    controller.createConnection(interaction);
-  }
+  // if (!getVoiceConnection(interaction.guildId)) {
+  //   const owner = await interaction.guild.fetchOwner();
+  //   if (owner.id !== interaction.user.id) {
+  //     interaction.reply({ content: 'You must be a group creator to create a connection', ephemeral: true });
+  //     return;
+  //   }
+  //   await connectionManager.addConnection(interaction);
+  // }
 
   try {
-    await controller.doCommand(interaction);
+    await controller.doCommand(interaction, connectionManager);
   } catch (error) {
     console.error(error);
     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

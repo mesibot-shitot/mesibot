@@ -3,7 +3,7 @@ const { Routes } = require('discord-api-types/v9');
 const { REST } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, getVoiceConnection } = require('@discordjs/voice');
 const Playlist = require('./Playlist');
 
 class CommandController {
@@ -37,32 +37,14 @@ class CommandController {
     }
   }
 
-  createConnection(interaction) {
-    const { channel } = interaction.member.voice;
-    if (!channel) {
-      interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
-      return;
-    }
-    this.connection = joinVoiceChannel({
-      channelId: channel.id,
-      guildId: interaction.guildId,
-      adapterCreator: interaction.guild.voiceAdapterCreator,
-    });
-    const player = createAudioPlayer();
-    this.connection.subscribe(player);
-    this.Playlist = new Playlist(player);
-    console.log('Bot is online!');
-  }
-
-  async doCommand(interaction) {
+  async doCommand(interaction, connectionManager) {
     const command = this.commandCollection.get(interaction.commandName);
     if (!command) {
-      console.log(this.commandCollection.keys());
       await interaction.reply({ content: 'This command does not exist!', ephemeral: true });
       return;
     }
     try {
-      await command.execute({ interaction, playlist: this.Playlist });
+      await command.execute({ interaction, connectionManager });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

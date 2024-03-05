@@ -1,12 +1,14 @@
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
 } = require('discord.js');
+const { connection } = require('mongoose');
+const { getVoiceConnection } = require('@discordjs/voice');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('exit')
-    .setDescription('Disconnect the bor from the voice channel.'),
-  execute: async ({ interaction, playlist }) => {
+    .setDescription('Disconnect the MesiBot from the voice channel.'),
+  execute: async ({ interaction, connectionManager }) => {
     const owner = await interaction.guild.fetchOwner();
     if (owner.id !== interaction.user.id) {
       interaction.reply({ content: 'You must be a group creator to use this command', ephemeral: true });
@@ -36,20 +38,23 @@ module.exports = {
       componentType: ComponentType.Button,
       time: 15000,
     });
-    collector.on('collect', (buttonInteraction) => {
+    collector.on('collect', async (buttonInteraction) => {
       let content = '';
       if (buttonInteraction.customId === 'cancel') {
-        buttonInteraction.reply({ content: 'Playlist not saved', ephemeral: true });
+        await buttonInteraction.update({ content: 'Disconnect canceled', ephemeral: true, components: [] });
+        return;
       }
+
       if (buttonInteraction.customId === 'save') {
+        connectionManager.savePlaylist(interaction.guildId);
         // playlist.savePlaylist(); // todo function and try catch
         content = 'Playlist saved';
-        interaction.guild.me.voice.disconnect();
       }
       if (buttonInteraction.customId === 'dont save') {
-        content = 'Disconnect without saving the playlist';
+        content = 'Disconnecting, playlist discarded';
       }
-      buttonInteraction.reply({ content, ephemeral: true });
+      connectionManager.removeConnection(interaction.guildId);
+      await buttonInteraction.update({ content, ephemeral: true, components: [] });
     });
   },
 };

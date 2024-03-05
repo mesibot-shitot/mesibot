@@ -5,7 +5,8 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('skip')
     .setDescription('skip the current song.'),
-  execute: async ({ interaction, playlist }) => {
+  execute: async ({ interaction, connectionManager }) => {
+    const { playlist } = connectionManager.findConnection(interaction.guildId);
     if (!playlist.queue) {
       await interaction.reply('there is no song playlist.');
       return;
