@@ -7,7 +7,7 @@ class PlaylistRepository {
     }
 
   fetchGroupPlaylists(id) {
-    return this.playlistStorage.getGroupPlaylists();
+    return this.playlistStorage.getGroupPlaylists(id);
 
   }
 

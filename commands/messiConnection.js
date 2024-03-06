@@ -1,5 +1,5 @@
 const {
-  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
+  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder
 } = require('discord.js');
 
 const { getVoiceConnection } = require('@discordjs/voice');
@@ -9,68 +9,74 @@ module.exports = {
     .setName('mesi')
     .setDescription('Invite Mesibot to the party!'),
   execute: async ({ interaction, connectionManager }) => {
-    if (!getVoiceConnection(interaction.guildId)) {
+    if (getVoiceConnection(interaction.guildId)) {
+      interaction.reply({ content: 'MesiBot is already connected to a voice channel', ephemeral: true });
+      return;
+    }
       const owner = await interaction.guild.fetchOwner();
       if (owner.id !== interaction.user.id) {
         interaction.reply({ content: 'You must be a group creator to create a connection', ephemeral: true });
         return;
       }
 
-      // connectionManager.fetchGroupPlaylists(interaction.guildId) // todo check if there are no playlists
-      //   .then((playlists) => {
-      //     const playlistNames = playlists.map((p) => p.name);
-      //     const embed = new EmbedBuilder()
-      //       .setColor('#0099ff')
-      //       .setTitle('Group Playlists')
-      //       .setDescription('Choose a playlist to import')
-      //       .addFields(
-      //         { name: 'Playlists', value: playlistNames.join('\n'), inline: true },
-      //       );
-      //     interaction.reply({ embeds: [embed] });
-      //   });
 
 
-      //   const importPlaylist = new ButtonBuilder()
-      //   .setCustomId('import')
-      //   .setLabel('Import')
-      //   .setStyle(ButtonStyle.Primary);
-      // const newPlaylist = new ButtonBuilder()
-      //   .setCustomId('new playlist')
-      //   .setLabel('New Playlist')
-      //   .setStyle(ButtonStyle.Primary);
+      const importPlaylist = new ButtonBuilder()
+        .setCustomId('import')
+        .setLabel('Import')
+        .setStyle(ButtonStyle.Primary);
+      const newPlaylist = new ButtonBuilder()
+        .setCustomId('new playlist')
+        .setLabel('New Playlist')
+        .setStyle(ButtonStyle.Primary);
 
-      //   const row = new ActionRowBuilder()
-      //   .addComponents( importPlaylist, newPlaylist);
+      const buttonRow = new ActionRowBuilder()
+        .addComponents(importPlaylist, newPlaylist);
 
-      // const userChoice = await interaction.reply({
-      //   content: 'Do you want to save the playlist?',
-      //   components: [row],
-      //   ephemeral: true,
-      // });
+      const userChoice = await interaction.reply({
+        content: 'Do you want to save the playlist?',
+        components: [buttonRow],
+        ephemeral: true,
+      });
 
-      // const collector = userChoice.createMessageComponentCollector({
-      //   componentType: ComponentType.Button,
-      //   time: 15000,
-      // });
-      // collector.on('collect', async (buttonInteraction) => {
-      //   let content = '';
+      const collector = userChoice.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        time: 15000,
+      });
+      collector.on('collect', async (buttonInteraction) => {
+        let content = '';
+        const { customId } = buttonInteraction;
+        if (customId === 'import') {
 
-      //   if (buttonInteraction.customId === 'import') {
-      //     connectionManager.savePlaylist(interaction.guildId);
-      //     //playlist.savePlaylist(); // todo function and try catch
-      //     content = 'Playlist imported';
-      //   }
-      //   if (buttonInteraction.customId === 'new playlist') {
-      //     content = 'create new playlist';
-      //   }
-      //   connectionManager.removeConnection(interaction.guildId);
-      //   await buttonInteraction.update({ content, ephemeral: true, components: [] });
-      // });
+          const select = new StringSelectMenuBuilder();
+          select.setCustomId('playlist');
+          select.setPlaceholder('Select a playlist');
+          const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
+          select.addOptions(playlists.map((playlist) => new StringSelectMenuOptionBuilder()
+            .setLabel(playlist.name)
+            .setValue(playlist._id.toString())));
+          const row = new ActionRowBuilder().addComponents(select);
+          const reply = await buttonInteraction.update({ content: 'Please select a playlist:', components: [row], ephemeral: true });
+          const selectCollector = reply.createMessageComponentCollector({
+            componentType: ComponentType.StringSelect,
+            time: 15000,
+          });
+          selectCollector.on('collect', async (selectInteraction) => {
+            const playlist = playlists.find((p) => p._id.toString() === selectInteraction.values[0]);
+            console.log("select interuction: ", selectInteraction, playlist);
+            connectionManager.addConnection(interaction, true, playlist);
+            await selectInteraction.update({ content: 'Playlist imported', ephemeral: true, components: [] });
+            await interaction.followUp('Let\'s get this party started!');
+          });
+          
+        }
+        if (buttonInteraction.customId === 'new playlist') {
+          connectionManager.addConnection(interaction, false);
+          await buttonInteraction.update({ content: 'create new playlist', ephemeral: true, components: [] });
+          await interaction.followUp('Let\'s get this party started!');
 
-      await connectionManager.addConnection(interaction, true, "65e85eae46a75f609bb94247");
-      //await connectionManager.addConnection(interaction, false);
+        }
+      });
 
-      interaction.reply('Let\'s get this party started!');
-    }
   },
 };

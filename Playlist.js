@@ -36,7 +36,6 @@ class Playlist {
   async addTrack(song) {
 
     song.place = this.queue.size() + this.playedList.length;
-    console.log(song.place);
     this.queue.enq(song);
 
     
