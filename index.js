@@ -4,10 +4,11 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const DbConnection = require('./DB/DbConnection');
 const playlistHandler = require('./DB/playlistHandler');
 
-// const app = express();
-// const port = process.env.PORT || 3000;
-// app.get('/', (req, res) => { res.status(200); });
-// app.listen(port, () => console.log(`Listening on port ${port}`));
+const app = express();
+
+const port = process.env.PORT || 3000;
+app.get('/', (req, res) => { res.status(200); });
+app.listen(port, () => console.log(`Listening on port ${port}`));
 const CommandController = require('./CommandController');
 const ConnectionManager = require('./connections/ConnectionManager');
 
