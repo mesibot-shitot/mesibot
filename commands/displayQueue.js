@@ -10,17 +10,15 @@ module.exports = {
     const queue = playlist.queue._elements;
     const songList = [];
     let index = 1;
-    for (const song in queue) {
+    queue.forEach((song) => {
       const newSong = {
-        name: `${index}) added by: ${queue[song].requestedBy} priority:  ${queue[song].priority} place: ${queue[song].place}`, value: `${queue[song].title}`, inline: false,
+        name: `${index}) ${song.title}`, value: `added by: ${song.requestedBy}`, inline: false,
       };
       index += 1;
       songList.push(newSong);
-    }
-    // todo add every song as a link in the embed (for voting system)
+    });
     const embed = new EmbedBuilder();
     if (playlist.queue.size() === 0 && playlist.current == null) {
-      // interaction.reply('The queue is empty');
       embed.setTitle('The queue is empty');
       embed.setColor('#ff0000');
       interaction.reply({ embeds: [embed] });
