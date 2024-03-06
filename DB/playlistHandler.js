@@ -14,11 +14,13 @@ class playlistHandler {
 
   getPlaylistById = (playlistId) => this.Model.find({ _id: playlistId });
 
+  getGroupPlaylist = (groupId, name) => this.Model.find({ groupId, name });
+
   createPlaylist = (Playlist) => this.Model.create(Playlist);
 
   getGroupPlaylists = (groupId) => this.Model.find({ groupId });
 
-  updatePlaylist = (playlistId, Playlist) => this.Model.updateOne({ playlistId }, Playlist);
+  putPlaylist = (_id, playlist) => this.Model.updateOne({ _id }, Playlist);
 
   deletePlaylist = (playlistId) => this.Model.deleteOne({ playlistId: Playlist });
 

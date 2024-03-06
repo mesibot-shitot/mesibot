@@ -12,6 +12,11 @@ module.exports = {
     if (owner.id !== interaction.user.id) {
       interaction.reply({ content: 'You must be a group creator to use this command', ephemeral: true });
     }
+     const connection = connectionManager.findConnection(interaction.guildId);
+       if (!connection.length) {
+          interaction.reply({ content: 'There is no connection to disconnect', ephemeral: true });
+          return;
+        }
     const save = new ButtonBuilder()
       .setCustomId('save')
       .setLabel('Save')
@@ -45,7 +50,13 @@ module.exports = {
       }
 
       if (buttonInteraction.customId === 'save') {
-        connectionManager.savePlaylist(interaction.guildId);
+        
+        if (connection.playlist.name){
+          connectionManager.updatePlaylist(interaction.guildId);
+        }
+        else {
+          connectionManager.savePlaylist(interaction.guildId);
+        }
         //playlist.savePlaylist(); // todo function and try catch
         content = 'Playlist saved';
       }

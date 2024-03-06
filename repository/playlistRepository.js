@@ -19,8 +19,13 @@ class PlaylistRepository {
     }
 
 
-  updatePlaylist(playlistId, Playlist) {
-    return this.playlistStorage.updatePlaylist({ playlistId }, Playlist);
+  updatePlaylist(playlistID, playlist) {
+    return this.playlistStorage.putPlaylist(playlistID , playlist);
+    
+  }
+
+  fetchGroupPlaylist(groupId, name) {
+    return this.playlistStorage.getGroupPlaylist(groupId, name);
   }
 
   deletePlaylist(playlistId) {

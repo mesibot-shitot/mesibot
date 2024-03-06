@@ -40,6 +40,12 @@ class ConnectionManager {
     connection.savePlaylist();
   }
 
+  updatePlaylist(id) {
+    const connection = this.findConnection(id);
+    if (!connection) throw new Error('Connection not found'); // todo change to custom error
+    connection.updatePlaylist();
+  }
+
   removeConnection(id) {
     const connection = this.findConnection(id);
     if (!connection) throw new Error('Connection not found'); // todo change to custom error

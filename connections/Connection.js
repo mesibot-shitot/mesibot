@@ -28,7 +28,7 @@ class Connection {
     // todo change here when working on loading playlist from DB
     this.playlist = new Playlist(player, interaction.guildId);
     //todo check playlist parameters
-    if (load){
+    if (load) {
       this.loadPlaylist(playlistId);
     }
     console.log(`Bot connected to #${this.group} group!`);
@@ -48,7 +48,7 @@ class Connection {
     const importedPlaylist = imported[0];
     importedPlaylist.queue.forEach((song) => {
       const { title, url, thumbnail, duration, requestedBy, songId, priority, place } = song;
-      const newSong = new Song( { title, url, thumbnail, duration, requestedBy, songId, priority, place });
+      const newSong = new Song({ title, url, thumbnail, duration, requestedBy, songId, priority, place });
       this.playlist.addTrack(newSong);
     });
     this.playlist.playedList = importedPlaylist.playedList;
@@ -57,14 +57,26 @@ class Connection {
 
   savePlaylist() {
     // todo save playlist to DB
+    this.nornalizePlaylist();
+    playlistDB.createPlaylist(this.nornalizePlaylist());
+  }
+
+  updatePlaylist() {
+    const playlistID =  playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);
+console.log(playlistID);
+    // this.nornalizePlaylist();
+    // playlistDB.updatePlaylist(this.nornalizePlaylist());
+  }
+
+  
+  nornalizePlaylist() {
     const playlist = {
       groupID: this.group,
       name: this.playlist.name,
       queue: this.playlist.queue._elements,
       playedList: this.playlist.playedList,
-    
     };
-      playlistDB.createPlaylist(playlist);
+    return playlist;
   }
 
   disconnect() {
