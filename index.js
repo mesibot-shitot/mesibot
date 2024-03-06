@@ -1,21 +1,13 @@
 require('dotenv').config();
 const express = require('express');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const DbConnection = require('./DB/DbConnection');
 const playlistHandler = require('./DB/playlistHandler');
 
-const app = express();
-const port = process.env.PORT || 3000;
-app.get('/', (req, res) => { res.status(200); });
-app.listen(port, () => console.log(`Listening on port ${port}`));
-const {
-  Client, GatewayIntentBits, Collection, REST,
-} = require('discord.js');
-const {
-  joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection,
-} = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
-const { GetListByKeyword } = require('youtube-search-api');
-const { Routes } = require('discord-api-types/v9');
+// const app = express();
+// const port = process.env.PORT || 3000;
+// app.get('/', (req, res) => { res.status(200); });
+// app.listen(port, () => console.log(`Listening on port ${port}`));
 const CommandController = require('./CommandController');
 const ConnectionManager = require('./connections/ConnectionManager');
 
