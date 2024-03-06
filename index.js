@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const DbConnection = require('./DB/DbConnection');
+const playlistHandler = require('./DB/playlistHandler');
 
 const app = express();
 const port = process.env.PORT || 3000;

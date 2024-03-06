@@ -45,33 +45,21 @@ class Connection {
 
   async loadPlaylist(id) {
     const imported = await playlistDB.getPlaylistById(id);
-    const importedPlaylist = imported[0];
-    importedPlaylist.queue.forEach((song) => {
-      const { title, url, thumbnail, duration, requestedBy, songId, priority, place } = song;
+    if (imported?.queue) {
+      imported.queue.forEach((song) => {
+        const { title, url, thumbnail, duration, requestedBy, songId, priority, place } = song;
       const newSong = new Song({ title, url, thumbnail, duration, requestedBy, songId, priority, place });
       this.playlist.addTrack(newSong);
-    });
-    this.playlist.playedList = importedPlaylist.playedList;
-    this.playlist.name = importedPlaylist.name;
+      });
+      this.playlist.playedList = imported.playedList;
+    this.playlist.name = imported.name;
+  } else {
+      console.error('Could not load playlist from DB, playlist is empty or does not exist');
   }
-
-  savePlaylist() {
-    // todo save playlist to DB
-    this.nornalizePlaylist();
-    playlistDB.createPlaylist(this.nornalizePlaylist());
   }
-
-  updatePlaylist() {
-    const playlistID =  playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);
-console.log(playlistID);
-    // this.nornalizePlaylist();
-    // playlistDB.updatePlaylist(this.nornalizePlaylist());
-  }
-
-  
-  nornalizePlaylist() {
+nornalizePlaylist() {
     const playlist = {
-      groupID: this.group,
+      groupId: this.group,
       name: this.playlist.name,
       queue: this.playlist.queue._elements,
       playedList: this.playlist.playedList,
@@ -79,6 +67,19 @@ console.log(playlistID);
     return playlist;
   }
 
+  savePlaylist() {
+    // todo save playlist to DB
+    this.nornalizePlaylist();
+    return playlistDB.createPlaylist(this.nornalizePlaylist());
+  }
+
+  updatePlaylist() {
+    const playlistID =  playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);
+    console.log(playlistID);
+    // this.nornalizePlaylist();
+    // playlistDB.updatePlaylist(this.nornalizePlaylist());
+  }
+  
   disconnect() {
     this.connection.destroy();
   }

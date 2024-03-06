@@ -1,4 +1,5 @@
 const { SongHandler } = require('../DB/songHandler');
+const { Song } = require('../Song');
 
 class SongRepository {
   constructor() {

@@ -67,7 +67,9 @@ module.exports = {
       //   await buttonInteraction.update({ content, ephemeral: true, components: [] });
       // });
 
-      await connectionManager.addConnection(interaction, true, "65e7832238b00df51a158c4a");
+      await connectionManager.addConnection(interaction, true, "65e85eae46a75f609bb94247");
+      //await connectionManager.addConnection(interaction, false);
+
       interaction.reply('Let\'s get this party started!');
     }
   },

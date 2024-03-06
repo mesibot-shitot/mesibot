@@ -13,7 +13,7 @@ module.exports = {
       interaction.reply({ content: 'You must be a group creator to use this command', ephemeral: true });
     }
      const connection = connectionManager.findConnection(interaction.guildId);
-       if (!connection.length) {
+       if (!connection) {
           interaction.reply({ content: 'There is no connection to disconnect', ephemeral: true });
           return;
         }
@@ -51,19 +51,24 @@ module.exports = {
 
       if (buttonInteraction.customId === 'save') {
         
-        if (connection.playlist.name){
-          connectionManager.updatePlaylist(interaction.guildId);
-        }
-        else {
+        // if (connection.playlist.name){
+        //   connectionManager.updatePlaylist(interaction.guildId);
+        // }
+        // else {
           connectionManager.savePlaylist(interaction.guildId);
-        }
-        //playlist.savePlaylist(); // todo function and try catch
+          connectionManager.removeConnection(interaction.guildId);
+
+        // }
+        //playlist.savePlaylist(interaction.guildId); // todo function and try catch
         content = 'Playlist saved';
       }
       if (buttonInteraction.customId === 'dont save') {
-        content = 'Disconnecting, playlist discarded';
+        content = 'Disconnecting, playlist discarded';       
+        connectionManager.removeConnection(interaction.guildId);
       }
-      connectionManager.removeConnection(interaction.guildId);
+      // if(connectionManager.savePlaylist(interaction.guildId)){
+      //   connectionManager.removeConnection(interaction.guildId);
+      // }
       await buttonInteraction.update({ content, ephemeral: true, components: [] });
     });
   },

@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const Path = require('path');
 const { config } = require('dotenv');
 const Playlist = require('../Playlist');
+const DbConnection = require('./DbConnection');
 
 
 class playlistHandler {
+
   constructor(entity) {
     this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
     this.Model = require(Path.join(__dirname, `../models/${this.entityName}.model.js`));
@@ -12,7 +14,7 @@ class playlistHandler {
 
   getPlaylists = () => this.Model.findPlaylist();
 
-  getPlaylistById = (playlistId) => this.Model.find({ _id: playlistId });
+  getPlaylistById = (_id) => this.Model.findOne({ _id });
 
   getGroupPlaylist = (groupId, name) => this.Model.find({ groupId, name });
 

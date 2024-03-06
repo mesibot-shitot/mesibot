@@ -5,6 +5,7 @@ const Song = require('../Song');
 const DbConnection = require('./DbConnection');
 
 class SongHandler {
+
   constructor(entity) {
     this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
     this.Model = require(Path.join(__dirname, `../models/${this.entityName}.model.js`));

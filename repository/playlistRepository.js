@@ -1,4 +1,5 @@
 const {playlistHandler} = require('../DB/playlistHandler');
+const { Playlist } = require('../Playlist');
 
 class PlaylistRepository {
     constructor() {
