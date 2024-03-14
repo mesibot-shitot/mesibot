@@ -48,4 +48,21 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isModalSubmit()) return;
+  const { customId, fields } = interaction;
+  if (customId === 'Save Playlist') {
+    const name = fields.getTextInputValue('playlistName');
+    const connection = connectionManager.findConnection(interaction.guildId);
+    if (!connection) {
+      interaction.reply({ content: 'There is no connection to save', ephemeral: true });
+      return;
+    }
+    connection.setPlaylistName(name);
+    connection.savePlaylist();
+    connectionManager.removeConnection(interaction.guildId);
+    await interaction.reply({ content: 'Playlist was saved', components: [] });
+  }
+});
+
 client.login(token);

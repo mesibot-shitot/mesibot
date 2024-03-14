@@ -4,9 +4,7 @@ const { config } = require('dotenv');
 const Playlist = require('../Playlist');
 const DbConnection = require('./DbConnection');
 
-
 class playlistHandler {
-
   constructor(entity) {
     this.entityName = entity.charAt(0).toLowerCase() + entity.slice(1);
     this.Model = require(Path.join(__dirname, `../models/${this.entityName}.model.js`));
@@ -22,7 +20,7 @@ class playlistHandler {
 
   getGroupPlaylists = (groupId) => this.Model.find({ groupId });
 
-  putPlaylist = (_id, playlist) => this.Model.updateOne({ _id }, Playlist);
+  putPlaylist = (_id, playlist) => this.Model.updateOne({ _id }, playlist);
 
   deletePlaylist = (playlistId) => this.Model.deleteOne({ playlistId: Playlist });
 

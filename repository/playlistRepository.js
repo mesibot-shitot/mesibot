@@ -1,28 +1,25 @@
-const {playlistHandler} = require('../DB/playlistHandler');
+const { playlistHandler } = require('../DB/playlistHandler');
 const { Playlist } = require('../Playlist');
 
 class PlaylistRepository {
-    constructor() {
-      this.playlistStorage = new playlistHandler('playlist'); 
-    }
+  constructor() {
+    this.playlistStorage = new playlistHandler('playlist');
+  }
 
   fetchGroupPlaylists(id) {
     return this.playlistStorage.getGroupPlaylists(id);
-
   }
 
   getPlaylistById(playlistId) {
     return this.playlistStorage.getPlaylistById(playlistId);
   }
 
-    createPlaylist(Playlist) {
-        return this.playlistStorage.createPlaylist(Playlist);
-    }
-
+  createPlaylist(Playlist) {
+    return this.playlistStorage.createPlaylist(Playlist);
+  }
 
   updatePlaylist(playlistID, playlist) {
-    return this.playlistStorage.putPlaylist(playlistID , playlist);
-    
+    return this.playlistStorage.putPlaylist(playlistID, playlist);
   }
 
   fetchGroupPlaylist(groupId, name) {

@@ -6,7 +6,6 @@ const Song = require('../Song');
 
 const playlistDB = new PlaylistRepository();
 class Connection {
-
   playlist = null;
 
   members = []; // todo for statistics
@@ -27,7 +26,7 @@ class Connection {
     this.connection.subscribe(player);
     // todo change here when working on loading playlist from DB
     this.playlist = new Playlist(player, interaction.guildId);
-    //todo check playlist parameters
+    // todo check playlist parameters
     if (load) {
       this.loadPlaylist(playlistId);
     }
@@ -47,24 +46,32 @@ class Connection {
     const imported = await playlistDB.getPlaylistById(id);
     if (imported?.queue) {
       imported.queue.forEach((song) => {
-        const { title, url, thumbnail, duration, requestedBy, songId, priority, place } = song;
-      const newSong = new Song({ title, url, thumbnail, duration, requestedBy, songId, priority, place });
-      this.playlist.addTrack(newSong);
+        const {
+          title, url, thumbnail, duration, requestedBy, songId, priority, place,
+        } = song;
+        const newSong = new Song({
+          title, url, thumbnail, duration, requestedBy, songId, priority, place,
+        });
+        this.playlist.addTrack(newSong);
       });
       this.playlist.playedList = imported.playedList;
-    this.playlist.name = imported.name;
-  } else {
+      this.playlist.name = imported.name;
+    } else {
       console.error('Could not load playlist from DB, playlist is empty or does not exist');
+    }
   }
-  }
-nornalizePlaylist() {
-    const playlist = {
+
+  nornalizePlaylist() {
+    return {
       groupId: this.group,
       name: this.playlist.name,
       queue: this.playlist.queue._elements,
       playedList: this.playlist.playedList,
     };
-    return playlist;
+  }
+
+  setPlaylistName(name) {
+    this.playlist.name = name;
   }
 
   savePlaylist() {
@@ -73,13 +80,14 @@ nornalizePlaylist() {
     return playlistDB.createPlaylist(this.nornalizePlaylist());
   }
 
-  updatePlaylist() {
-    const playlistID =  playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);
-    console.log(playlistID);
-    // this.nornalizePlaylist();
-    // playlistDB.updatePlaylist(this.nornalizePlaylist());
+  async updatePlaylist() {
+    const playlist = await playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);// todo try catch
+    const { _id } = playlist[0];
+    // console.log(_id);
+    const newPlaylist = this.nornalizePlaylist();
+    console.log(await playlistDB.updatePlaylist(_id, newPlaylist));
   }
-  
+
   disconnect() {
     this.connection.destroy();
   }

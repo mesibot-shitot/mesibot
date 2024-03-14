@@ -22,7 +22,7 @@ module.exports = {
       return;
     }
     try {
-      const songInfo = await GetListByKeyword(`${songName} lyrics`, false);
+      const songInfo = await GetListByKeyword(`${songName} official audio`, false);
       if (!songInfo || songInfo.items.length === 0) {
         interaction.reply({ content: 'Song not found.', ephemeral: true });
         return;
