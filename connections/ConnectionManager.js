@@ -25,10 +25,9 @@ class ConnectionManager {
     //  todo check if connection exists in database
   }
 
-  fetchGroupPlaylists(id) { 
+  fetchGroupPlaylists(id) {
     return playlistDB.fetchGroupPlaylists(id);
   }
-
 
   findConnection(id) {
     return this.connections.find((c) => c.group === id);

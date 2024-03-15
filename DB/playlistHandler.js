@@ -14,7 +14,7 @@ class playlistHandler {
 
   getPlaylistById = (_id) => this.Model.findOne({ _id });
 
-  getGroupPlaylist = (groupId, name) => this.Model.find({ groupId, name });
+  getGroupPlaylist = (groupId, name) => this.Model.findOne({ groupId, name });
 
   createPlaylist = (Playlist) => this.Model.create(Playlist);
 

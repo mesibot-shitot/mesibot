@@ -45,8 +45,12 @@ module.exports = {
       time: 15000,
     });
     collector.on('collect', async (buttonInteraction) => {
-      // buttonInteraction.deferUpdate();
+      let content = '';
       const { customId } = buttonInteraction;
+      if (customId === 'cancel') {
+        await buttonInteraction.update({ content: 'Ho You\'re Staying! How Fun  :partying_face: ', components: [] });
+        return;
+      }
       if (customId === 'save') {
         if (!connection.playlist.name) {
           const modal = new ModalBuilder()
@@ -60,21 +64,44 @@ module.exports = {
             .setRequired(true);
           const NameRaw = new ActionRowBuilder().addComponents(NameInput);
           modal.addComponents(NameRaw);
+          await interaction.editReply({ content: 'Saving...', components: [] });
           await buttonInteraction.showModal(modal);
-          // await buttonInteraction.update({ content: 'Playlist saved', components: [] });
+          const filter = (submit) => submit.customId === 'Save Playlist';
+          // todo handle error
+          const success = await buttonInteraction.awaitModalSubmit({ filter, time: 15_000 })
+            .then((d) => console.log(d))
+            .catch((error) => console.error(error));
+          if (!success) return;
+          connectionManager.removeConnection(interaction.guildId);
           return;
         }
         await connection.updatePlaylist();
-        connectionManager.removeConnection(interaction.guildId);
-        await buttonInteraction.update({ content: 'Playlist updated', components: [] });
-        return;
+        content = 'Playlist updated';
       }
       if (customId === 'dont save') {
-        connectionManager.removeConnection(interaction.guildId);
-        await buttonInteraction.update({ content: 'Playlist not saved', components: [] });
-        return;
+        content = 'Playlist was not saved';
       }
-      await buttonInteraction.update({ content: 'Ho You\'re Staying! How Fun  :partying_face: ', components: [] });
+      connectionManager.removeConnection(interaction.guildId);
+      await buttonInteraction.update({ content, components: [] });
     });
+    // collector.on('end', async (collected) => {
+    //   // Remove buttons after timeout or interaction completes
+    //   if (collected.size === 0) {
+    //     await interaction.editReply({ content: 'Selection timed out', components: [] });
+    //   }
+    // });
   },
+};
+
+const handleModalSubmit = async (modalInteraction, connection) => {
+  const name = modalInteraction.fields.getTextInputValue('playlistName');
+  const isExisting = await connection.fetchPlaylistName(name);
+  if (isExisting) {
+    modalInteraction.reply({ content: 'A Playlist with this name already exists \nPlease try again   :x:', ephemeral: true });
+    return false;
+  }
+  connection.setPlaylistName(name);
+  connection.savePlaylist();
+  await modalInteraction.reply({ content: `Playlist  **'${name}'**  was saved   :white_check_mark:`, components: [], ephemeral: true });
+  return true;
 };

@@ -5,7 +5,10 @@ const playlistSchema = new Schema({
     type: String,
     index: true,
   },
-  name: { type: String },
+  name: {
+    type: String,
+    unique: true,
+  },
   queue: { type: Array },
   playedList: { type: Array },
 }, this.collection = 'playlist');

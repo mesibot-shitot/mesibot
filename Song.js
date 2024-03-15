@@ -8,6 +8,7 @@ const VOTE = {
 };
 class Song {
   place = -1;
+
   constructor({
     title, url, thumbnail, duration, requestedBy, songId, priority = 0,
   }) {
@@ -59,7 +60,8 @@ class Song {
       this.priority += (newVote * 2);
       return message;
     }
-    const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
+    // todo: check if this is the right way to get the user id
+    const newUser = { user: interaction.user.id, vote: newVote };
     this.vote.push(newUser);
 
     message = 'Vote registered';

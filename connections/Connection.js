@@ -80,10 +80,13 @@ class Connection {
     return playlistDB.createPlaylist(this.nornalizePlaylist());
   }
 
+  async fetchPlaylistName(name) {
+    return playlistDB.fetchGroupPlaylist(this.group, name);
+  }
+
   async updatePlaylist() {
     const playlist = await playlistDB.fetchGroupPlaylist(this.group, this.playlist.name);// todo try catch
-    const { _id } = playlist[0];
-    // console.log(_id);
+    const { _id } = playlist;
     const newPlaylist = this.nornalizePlaylist();
     console.log(await playlistDB.updatePlaylist(_id, newPlaylist));
   }
