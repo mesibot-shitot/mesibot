@@ -8,6 +8,7 @@ const VOTE = {
 };
 class Song {
   place = -1;
+
   constructor({
     title, url, thumbnail, duration, requestedBy, songId, priority = 0,
   }) {
@@ -20,6 +21,7 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
+    this.skipc = [];//
   }
 
   getResource() {
@@ -33,6 +35,10 @@ class Song {
 
   getUserVote(userID) {
     return this.vote.find((vote) => vote.user === userID); // todo: doubled user class
+  }
+
+  getUserSkip(userID) {
+    return this.skipc.find((skip) => skip.user === userID); // todo: doubled user class
   }
 
   // recalculatePriority(vote) { //todo: implement recalculatePriority, Add statistical priority
@@ -59,12 +65,19 @@ class Song {
       this.priority += (newVote * 2);
       return message;
     }
+    // eslint-disable-next-line max-len
     const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
     this.vote.push(newUser);
 
     message = 'Vote registered';
     this.priority += newVote;
     return message;
+  }
+
+  setskip(interaction) {
+    // eslint-disable-next-line max-len
+    const newUser = { user: interaction.user.id };
+    this.skipc.push(newUser);
   }
 }
 
