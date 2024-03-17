@@ -11,6 +11,7 @@ app.get('/', (req, res) => { res.status(200); });
 app.listen(port, () => console.log(`Listening on port ${port}`));
 const CommandController = require('./CommandController');
 const ConnectionManager = require('./connections/ConnectionManager');
+const { slashInteraction } = require('./handlers/ineractionHandler');
 
 const client = new Client({
   intents: [
@@ -28,23 +29,5 @@ client.commands = new Collection();
 client.once('ready', async () => {
   await controller.reloadCommands();
 });
-
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
-  const { channel } = interaction.member.voice;
-  if (!channel) {
-    interaction.reply({ content: 'You need to be in a voice channel.', ephemeral: true });
-    return;
-  }
-  if (!connectionManager.findConnection(interaction.guildId) && interaction.commandName !== 'mesi') {
-    interaction.reply({ content: 'You need to connect the bot to a voice channel first.\n**Call mesi over with /mesi**', ephemeral: true });
-    return;
-  }
-  try {
-    await controller.doCommand(interaction, connectionManager);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-  }
-});
+client.on('interactionCreate', (interaction) => slashInteraction(interaction, connectionManager, controller));
 client.login(token);
