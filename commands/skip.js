@@ -13,7 +13,6 @@ module.exports = {
     }
     const embed = new EmbedBuilder();
     if (playlist.queue.isEmpty()) {
-      // playlist.player.pause(playlist.current);
       embed.setTitle('You can`t skip this is the last song, add another song to skip');
       interaction.reply({ embeds: [embed] });
       return;

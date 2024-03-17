@@ -1,5 +1,5 @@
 const PriorityQueue = require('priorityqueuejs');
-const SongRepository = require('./repository/songRepository');
+const statRepository = require('./repository/statRepository');
 
 const comparator = (songA, songB) => {
   const sum = songA.priority - songB.priority;
@@ -7,12 +7,13 @@ const comparator = (songA, songB) => {
   return sum;
 };
 
-const songDB = new SongRepository();
+const statDB = new statRepository();
 class Playlist {
   name = '';
 
-  constructor(player, groupID) {
+  constructor(player, groupID, id) {
     this.groupID = groupID;
+    this.id = id;
     this.queue = new PriorityQueue(comparator);
     this.playedList = [];
     this.player = player;
@@ -33,12 +34,17 @@ class Playlist {
     });
   }
 
-  // adds a song to the queue
   async addTrack(song) {
     song.place = this.queue.size() + this.playedList.length;
     this.queue.enq(song);
-
-    // await songDB.createSong(song); // todo: add try catch
+    const stat = {
+      songId: song.songId,
+      groupId: this.groupID,
+      action: 'add',
+      playlist: this.id,
+      userId: song.requestedBy,
+    };
+    await statDB.createAction(stat);
   }
 
   // plays the next song in the queue

@@ -7,7 +7,11 @@ const playlistSchema = new Schema({
   },
   name: {
     type: String,
-    unique: true,
+    required: true,
+  },
+  isDraft: {
+    type: Boolean,
+    default: true,
   },
   queue: { type: Array },
   playedList: { type: Array },
