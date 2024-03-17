@@ -17,12 +17,24 @@ module.exports = {
       interaction.reply({ embeds: [embed] });
       return;
     }
-
-    playlist.skip();
-    embed.setTitle('skipped');
-    embed.setDescription(`now playing **${playlist.current.title}**`);
+    const { channel } = interaction.member.voice;
+    const existingUser = playlist.current.getUserSkip(interaction.user.id);
+    if (existingUser) {
+      interaction.reply('You\'ve already voted to skip this song');
+      return;
+    }
+    playlist.current.setskip(interaction);
+    if ((playlist.current.skipc.length) === Math.ceil(channel.members.size / 2) - 1) {
+      playlist.skip();
+      embed.setTitle('skipped');
+      embed.setDescription(`now playing **${playlist.current.title}**`);
+      interaction.reply({ embeds: [embed] });
+      return;
+    }
+    const sum = Math.ceil((channel.members.size / 2) - (playlist.current.skipc.length));
+    // eslint-disable-next-line no-template-curly-in-string
+    await interaction.reply(`You need ${sum} more members to skip this song`);
     // embed.setThunbnail(playlist.current.thumbnail);
-    interaction.reply({ embeds: [embed] });
   },
 
 };
