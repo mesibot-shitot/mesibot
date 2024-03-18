@@ -12,7 +12,7 @@ module.exports = {
     let index = 1;
     queue.forEach((song) => {
       const newSong = {
-        name: `${index}) ${song.title}`, value: `added by: ${song.requestedBy}`, inline: false,
+        name: `${index}) ${song.title}`, value: `added by: ${song.requestedBy.userName}`, inline: false,
       };
       index += 1;
       songList.push(newSong);

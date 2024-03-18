@@ -34,17 +34,26 @@ class Playlist {
     });
   }
 
-  async addTrack(song) {
+  pushToQueue(song) {
     song.place = this.queue.size() + this.playedList.length;
     this.queue.enq(song);
-    const stat = {
-      songId: song.songId,
+  }
+
+  async addTrack(song) {
+    this.pushToQueue(song);
+    await statDB.createAction({
+      song: {
+        songId: song.songId,
+        songTitle: song.title,
+      },
       groupId: this.groupID,
       action: 'add',
       playlist: this.id,
-      userId: song.requestedBy,
-    };
-    await statDB.createAction(stat);
+      user: {
+        userId: song.requestedBy.userId,
+        userName: song.requestedBy.userName,
+      }
+    });
   }
 
   // plays the next song in the queue
@@ -53,10 +62,10 @@ class Playlist {
       this.player.unpause();
       return;
     }
-    this.skip();
+    this.nextSong();
   }
 
-  skip() {
+  nextSong() {
     if (this.queue.isEmpty()) {
       return;
     }
@@ -66,6 +75,21 @@ class Playlist {
     this.current.Played = true;
     this.playedList.push(this.current);
     this.player.playing = true;
+    
+  }
+  
+  async skip() {
+    this.nextSong();
+    await statDB.createAction({
+      song: {
+        songId: this.current.songId,
+        songTitle: this.current.title,
+      },
+      groupId: this.groupID,
+      action: 'songSkip',
+      playlist: this.id,
+    });
+    
   }
 
   getQueue() {
@@ -84,6 +108,27 @@ class Playlist {
   // destroys the queue
   destroy() {
     this.queue = [];
+  }
+
+  async checkUserSkip(userId, userName) {
+    if (this.current.getUserSkip(userId)) {
+      return true;
+    } 
+    await statDB.createAction({
+      song: {
+        songId: this.current.songId,
+        songTitle: this.current.title,
+      },
+      groupId: this.groupID,
+      action: 'userSkip',
+      playlist: this.id,
+      user: {
+        userId: userId,
+        userName: userName,
+      },
+    });
+    return false;
+
   }
 
   reorderQueue() {

@@ -53,7 +53,7 @@ module.exports = {
         const songId = topResults[index].id;
         const { thumbnail } = topResults[index];
         const duration = topResults[index].length.simpleText;
-        const requestedBy = member.user.username;
+        const requestedBy = { userId: member.user.id, userName: member.user.username };
         const newSong = new Song({
           title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, priority: 0,
         });

@@ -58,7 +58,7 @@ class Connection {
         const newSong = new Song({
           title, url, thumbnail, duration, requestedBy, songId, priority, place,
         });
-        this.playlist.addTrack(newSong);
+        this.playlist.pushToQueue(newSong);
       });
       this.playlist.playedList = imported.playedList;
       this.playlist.name = imported.name;

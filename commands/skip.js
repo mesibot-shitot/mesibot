@@ -18,7 +18,7 @@ module.exports = {
       return;
     }
     const { channel } = interaction.member.voice;
-    const existingUser = playlist.current.getUserSkip(interaction.user.id);
+    const existingUser = await playlist.checkUserSkip(interaction.user.id, interaction.user.username);
     if (existingUser) {
       interaction.reply('You\'ve already voted to skip this song');
       return;
@@ -32,9 +32,7 @@ module.exports = {
       return;
     }
     const sum = Math.ceil((channel.members.size / 2) - (playlist.current.skipc.length));
-    // eslint-disable-next-line no-template-curly-in-string
     await interaction.reply(`You need ${sum} more members to skip this song`);
-    // embed.setThunbnail(playlist.current.thumbnail);
   },
 
 };
