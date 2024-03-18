@@ -40,6 +40,7 @@ module.exports = {
       embed.setDescription(queue[0].title);
       embed.setThumbnail(queue[0].thumbnail);
     }
+
     interaction.reply({ embeds: [embed] });
   },
 };

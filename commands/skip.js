@@ -17,6 +17,10 @@ module.exports = {
       interaction.reply({ embeds: [embed] });
       return;
     }
+    if (!playlist.player.playing) {
+      interaction.reply('You can`t skip there is no song playing');
+      return;
+    }
     const { channel } = interaction.member.voice;
     const existingUser = await playlist.checkUserSkip(interaction.user.id, interaction.user.username);
     if (existingUser) {
@@ -24,7 +28,7 @@ module.exports = {
       return;
     }
     playlist.current.setskip(interaction);
-    if ((playlist.current.skipc.length) === Math.ceil(channel.members.size / 2) - 1) {
+    if ((playlist.current.skipc.length) >= Math.ceil(channel.members.size / 2)) {
       playlist.skip();
       embed.setTitle('skipped');
       embed.setDescription(`now playing **${playlist.current.title}**`);
