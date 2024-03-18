@@ -69,7 +69,7 @@ module.exports = {
 
       if (buttonInteraction.customId === 'new playlist') {
         const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
-        if (playlists.length >= 2) {
+        if (playlists.length >= 25) {
           await interaction.followUp('It is not possible to add another playlist, the limit is 25');
           return;
         }
