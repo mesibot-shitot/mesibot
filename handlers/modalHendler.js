@@ -6,7 +6,7 @@ const handleModalSubmit = async (modalInteraction, connection) => {
     return false;
   }
   connection.setPlaylistName(name);
-  connection.savePlaylist();
+  await connection.savePlaylist();
   await modalInteraction.reply({ content: `Playlist  **'${name}'**  was saved   :white_check_mark:`, components: [], ephemeral: true });
   return true;
 };

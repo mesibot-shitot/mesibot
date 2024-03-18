@@ -1,5 +1,5 @@
 const PriorityQueue = require('priorityqueuejs');
-const SongRepository = require('./repository/songRepository');
+const StatRepository = require('./repository/statRepository');
 
 const comparator = (songA, songB) => {
   const sum = songA.priority - songB.priority;
@@ -7,12 +7,14 @@ const comparator = (songA, songB) => {
   return sum;
 };
 
-const songDB = new SongRepository();
+const statDB = new StatRepository();
 class Playlist {
   name = '';
 
-  constructor(player, groupID) {
-    this.groupID = groupID;
+  constructor(player, group, id) {
+    this.groupID = group.id;
+    this.owner = group.owner;
+    this.id = id;
     this.queue = new PriorityQueue(comparator);
     this.playedList = [];
     this.player = player;
@@ -33,12 +35,26 @@ class Playlist {
     });
   }
 
-  // adds a song to the queue
-  async addTrack(song) {
+  pushToQueue(song) {
     song.place = this.queue.size() + this.playedList.length;
     this.queue.enq(song);
+  }
 
-    // await songDB.createSong(song); // todo: add try catch
+  async addTrack(song) {
+    this.pushToQueue(song);
+    await statDB.createAction({
+      song: {
+        songId: song.songId,
+        songTitle: song.title,
+      },
+      groupId: this.groupID,
+      action: 'songAdded',
+      playlist: this.id,
+      user: {
+        userId: song.requestedBy.userId,
+        userName: song.requestedBy.userName,
+      },
+    });
   }
 
   // plays the next song in the queue
@@ -47,10 +63,10 @@ class Playlist {
       this.player.unpause();
       return;
     }
-    this.skip();
+    this.nextSong();
   }
 
-  skip() {
+  nextSong() {
     if (this.queue.isEmpty()) {
       return;
     }
@@ -62,22 +78,37 @@ class Playlist {
     this.player.playing = true;
   }
 
-  getQueue() {
-    return this.queue.slice(0, 10);
+  async skip() {
+    this.nextSong();
+    await statDB.createAction({
+      song: {
+        songId: this.current.songId,
+        songTitle: this.current.title,
+      },
+      groupId: this.groupID,
+      action: 'songSkip',
+      playlist: this.id,
+    });
   }
 
-  saveQueue() {
-    songDB.saveQueue(this.queue._elements);
-  }
-
-  // returns the current song
-  getCurrentSong() {
-    return this.queue[0];
-  }
-
-  // destroys the queue
-  destroy() {
-    this.queue = [];
+  async checkUserSkip(userId, userName) {
+    if (this.current.getUserSkip(userId)) {
+      return true;
+    }
+    await statDB.createAction({
+      song: {
+        songId: this.current.songId,
+        songTitle: this.current.title,
+      },
+      groupId: this.groupID,
+      action: 'userSkip',
+      playlist: this.id,
+      user: {
+        userId,
+        userName,
+      },
+    });
+    return false;
   }
 
   reorderQueue() {
@@ -86,6 +117,32 @@ class Playlist {
       newQueue.enq(this.queue.deq());
     }
     this.queue = newQueue;
+  }
+
+  async songRemoved(songTitle, songId) {
+    return statDB.createAction({
+      song: {
+        songId,
+        songTitle,
+      },
+      groupId: this.groupID,
+      action: 'songRemoved',
+      playlist: this.id,
+    });
+  }
+  async voteSong(song, userId, action) {
+    return statDB.createAction({
+      song: {
+        songId: song.songId,
+        songTitle: song.title,
+      },
+      groupId: this.groupID,
+      action,
+      playlist: this.id,
+      user: {
+        userId,
+      },
+    });
   }
 }
 

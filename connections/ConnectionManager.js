@@ -26,7 +26,7 @@ class ConnectionManager {
   }
 
   fetchGroupPlaylists(id) {
-    return playlistDB.fetchGroupPlaylists(id);
+    return playlistDB.fetchGroupsActivePlaylists(id);
   }
 
   findConnection(id) {

@@ -42,7 +42,6 @@ class Song {
   // }
   disLikeCount() {
     const count = this.vote.filter((vote) => vote.vote === -1);
-    console.log(count.length);
     return count.length;
   }
 

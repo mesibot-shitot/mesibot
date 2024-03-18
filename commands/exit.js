@@ -53,7 +53,7 @@ module.exports = {
         return;
       }
       if (customId === 'save') {
-        if (!connection.playlist.name) {
+        if (connection.playlist.name === '' || connection.playlist.name === 'default') {
           const modal = new ModalBuilder()
             .setCustomId('Save Playlist')
             .setTitle('Save Playlist');
@@ -79,11 +79,12 @@ module.exports = {
           connectionManager.removeConnection(interaction.guildId);
           return;
         }
-        await connection.updatePlaylist();
+        await connection.savePlaylist();
         content = 'Playlist updated';
       }
       if (customId === 'dont save') {
         content = 'Playlist was not saved';
+        await connection.discardPlaylist();
       }
       connectionManager.removeConnection(interaction.guildId);
       await buttonInteraction.update({ content, components: [] });
