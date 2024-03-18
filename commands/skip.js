@@ -18,6 +18,10 @@ module.exports = {
       interaction.reply({ embeds: [embed] });
       return;
     }
+    if (!playlist.player.playing) {
+      interaction.reply('You can`t skip there is no song playing');
+      return;
+    }
     const { channel } = interaction.member.voice;
     const existingUser = playlist.current.getUserSkip(interaction.user.id);
     if (existingUser) {
@@ -25,7 +29,7 @@ module.exports = {
       return;
     }
     playlist.current.setskip(interaction);
-    if ((playlist.current.skipc.length) === Math.ceil(channel.members.size / 2) - 1) {
+    if ((playlist.current.skipc.length) >= Math.ceil(channel.members.size / 2)) {
       playlist.skip();
       embed.setTitle('skipped');
       embed.setDescription(`now playing **${playlist.current.title}**`);
@@ -34,7 +38,7 @@ module.exports = {
     }
     const sum = Math.ceil((channel.members.size / 2) - (playlist.current.skipc.length));
     // eslint-disable-next-line no-template-curly-in-string
-    await interaction.reply(`You need ${sum} more members to skip this song`);
+    await interaction.reply({ content: `You need ${sum} more members to skip this song`, ephemeral: true });
     // embed.setThunbnail(playlist.current.thumbnail);
   },
 
