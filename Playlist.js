@@ -118,6 +118,18 @@ class Playlist {
     }
     this.queue = newQueue;
   }
+
+  async songRemoved(songTitle, songId) {
+    return statDB.createAction({
+      song: {
+        songId,
+        songTitle,
+      },
+      groupId: this.groupID,
+      action: 'songRemoved',
+      playlist: this.id,
+    });
+  }
 }
 
 module.exports = Playlist;

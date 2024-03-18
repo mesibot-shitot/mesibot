@@ -79,11 +79,12 @@ module.exports = {
           connectionManager.removeConnection(interaction.guildId);
           return;
         }
-        await connection.updatePlaylist();
+        await connection.savePlaylist();
         content = 'Playlist updated';
       }
       if (customId === 'dont save') {
         content = 'Playlist was not saved';
+        await connection.discardPlaylist();
       }
       connectionManager.removeConnection(interaction.guildId);
       await buttonInteraction.update({ content, components: [] });

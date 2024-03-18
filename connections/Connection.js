@@ -88,21 +88,33 @@ class Connection {
     this.playlist.name = name;
   }
 
-  savePlaylist() {
-    return playlistDB.updatePlaylist(this.playlist.id, this.normalizePlaylist());
+  async savePlaylist() {
+    await playlistDB.updatePlaylist(this.playlist.id, this.normalizePlaylist());
+    await this.savePlaylistStat();
   }
 
   async fetchPlaylistName(name) {
     return playlistDB.fetchGroupPlaylist(this.group, name);
   }
 
-  async updatePlaylist() {
-    const newPlaylist = this.normalizePlaylist();
-    console.log(await playlistDB.updatePlaylist(this.playlist.id, newPlaylist));
+  async savePlaylistStat(){
+    return statDB.createAction({
+      groupId: this.group,
+      action: 'playlistSaved',
+      playlist: this.playlist.id,
+    });
   }
 
   disconnect() {
     this.connection.destroy();
+  }
+
+  async discardPlaylist(){
+    return statDB.createAction({
+      groupId: this.group,
+      action: 'playlistDiscarded',
+      playlist: this.playlist.id,
+    });
   }
 }
 module.exports = Connection;

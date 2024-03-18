@@ -3,6 +3,7 @@ const {
   MessageActionRow, MessageButton, EmbedBuilder, VoiceChannel,
 } = require('discord.js');
 const Playlist = require('../Playlist');
+const Song = require('../Song');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -32,7 +33,9 @@ module.exports = {
     const { channel } = interaction.member.voice;
     if ((queue[songNum].disLikeCount()) === Math.ceil(channel.members.size / 2)) {
       const name = queue[songNum].title;
+      const songId = queue[songNum].songId;
       queue.splice(songNum, 1);
+      await playlist.songRemoved(name, songId);
       await interaction.reply(`${name} was removed from queue`);
     } else {
       interaction.reply({ content: `${message}`, ephemeral: true });
