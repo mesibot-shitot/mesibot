@@ -49,7 +49,8 @@ module.exports = {
         select.setCustomId('playlist');
         select.setPlaceholder('Select a playlist');
         const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
-        select.addOptions(playlists.map((playlist) => new StringSelectMenuOptionBuilder()
+        const filteredPlaylists = playlists.filter((playlist) => playlist.name !== '');
+        select.addOptions(filteredPlaylists.map((playlist) => new StringSelectMenuOptionBuilder()
           .setLabel(playlist.name)
           .setValue(playlist._id.toString())));
         const row = new ActionRowBuilder().addComponents(select);
