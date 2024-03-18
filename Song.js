@@ -2,10 +2,6 @@ const ytdl = require('ytdl-core');
 const { createAudioResource } = require('@discordjs/voice');
 const user = require('./User');
 
-const VOTE = {
-  UP: 1,
-  DOWN: -1,
-};
 class Song {
   place = -1;
 
@@ -34,11 +30,11 @@ class Song {
   }
 
   getUserVote(userID) {
-    return this.vote.find((vote) => vote.user === userID); // todo: doubled user class
+    return this.vote.find((vote) => vote.user === userID);
   }
 
   getUserSkip(userID) {
-    return this.skipc.find((skip) => skip.user === userID); // todo: doubled user class
+    return this.skipc.find((skip) => skip.user === userID);
   }
 
   // recalculatePriority(vote) { //todo: implement recalculatePriority, Add statistical priority
@@ -50,35 +46,10 @@ class Song {
     return count.length;
   }
 
-  setVote(interaction) {
-    const existingUser = this.getUserVote(interaction.user.id);
-    const voteExtract = interaction.options.getString('vote');
-    const newVote = VOTE[voteExtract];
-    let message;
-    if (existingUser) {
-      if (existingUser.vote === newVote) {
-        message = 'You already voted for this song'; // todo pop user out of vote list as if he never voted
-        return message;
-      }
-      existingUser.vote = newVote;
-      message = 'You have changed your vote';
-      this.priority += (newVote * 2);
-      return message;
-    }
-    // eslint-disable-next-line max-len
-    const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
-    this.vote.push(newUser);
-
-    message = 'Vote registered';
-    this.priority += newVote;
-    return message;
-  }
-
   setskip(interaction) {
     // eslint-disable-next-line max-len
     const newUser = { user: interaction.user.id };
     this.skipc.push(newUser);
   }
 }
-
 module.exports = Song;
