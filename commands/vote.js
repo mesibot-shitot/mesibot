@@ -4,6 +4,7 @@ const {
 } = require('discord.js');
 const Playlist = require('../Playlist');
 const Song = require('../Song');
+const { connection } = require('mongoose');
 
 const VOTE = {
   UP: 1,
@@ -26,9 +27,10 @@ module.exports = {
       )
       .setRequired(true)),
   execute: async ({ interaction, connectionManager }) => {
-    const { playlist } = connectionManager.findConnection(interaction.guildId);
+    const connection = connectionManager.findConnection(interaction.guildId);
+    const { playlist } = connection;
     let songNum = interaction.options.getString('song-number');
-    const queue = playlist.queue._elements;
+    //const queue = playlist.queue._elements;
     if (songNum < 0 || songNum > playlist.queue.size() || Number.isNaN(songNum)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
@@ -36,12 +38,12 @@ module.exports = {
     songNum -= 1;
 
     try {
-      const message = setVote(interaction, queue[songNum]);
+      const song = connection.getSongByIndex(songNum);
+      const message = await setVote(interaction, song, connection);
       const { channel } = interaction.member.voice;
-      if ((queue[songNum].disLikeCount()) === Math.ceil(channel.members.size / 2)) {
-        const name = queue[songNum].title;
-        queue.splice(songNum, 1);
-        await interaction.reply(`${name} was removed from queue`);
+      if ((song.disLikeCount()) === Math.ceil(channel.members.size / 2)) {
+        await connection.removeSongFromPlaylist(songNum);
+        await interaction.reply(`${song.title} was removed from queue`);
       } else {
         interaction.reply({ content: `${message}`, ephemeral: true });
       }
@@ -51,7 +53,7 @@ module.exports = {
     }
   },
 };
-const setVote = (interaction, song) => {
+const setVote = async (interaction, song, connection) => {
   const existingUser = song.getUserVote(interaction.user.id);
   const voteExtract = interaction.options.getString('vote');
   const newVote = VOTE[voteExtract];
@@ -64,6 +66,7 @@ const setVote = (interaction, song) => {
     existingUser.vote = newVote;
     message = 'You have changed your vote';
     song.priority += (newVote * 2);
+    await connection.voteSong(song, interaction.user.id, newVote);
     return message;
   }
   // eslint-disable-next-line max-len
@@ -72,5 +75,6 @@ const setVote = (interaction, song) => {
 
   message = 'Vote registered';
   song.priority += newVote;
+  await connection.voteSong(song, interaction.user.id, newVote);
   return message;
 };

@@ -116,5 +116,22 @@ class Connection {
       playlist: this.playlist.id,
     });
   }
+
+  async removeSongFromPlaylist(songNum) {
+    const queue = this.playlist.queue._elements;
+    const name = queue[songNum].title;
+    const songId = queue[songNum].songId;
+    queue.splice(songNum, 1);
+    return this.playlist.songRemoved(name, songId);
+  }
+
+  getSongByIndex(index) {
+    return this.playlist.queue._elements[index];// todo throw error
+  }
+
+  async voteSong(song, userId, vote) {
+    const action = vote === 1 ? 'upVote' : 'downVote';
+    return this.playlist.voteSong(song, userId, action);
+  }
 }
 module.exports = Connection;

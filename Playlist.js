@@ -130,6 +130,20 @@ class Playlist {
       playlist: this.id,
     });
   }
+  async voteSong(song, userId, action) {
+    return statDB.createAction({
+      song: {
+        songId: song.songId,
+        songTitle: song.title,
+      },
+      groupId: this.groupID,
+      action,
+      playlist: this.id,
+      user: {
+        userId,
+      },
+    });
+  }
 }
 
 module.exports = Playlist;
