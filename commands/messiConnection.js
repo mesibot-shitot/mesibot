@@ -49,7 +49,8 @@ module.exports = {
         select.setCustomId('playlist');
         select.setPlaceholder('Select a playlist');
         const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
-        select.addOptions(playlists.map((playlist) => new StringSelectMenuOptionBuilder()
+        const filteredPlaylists = playlists.filter((playlist) => playlist.name !== '');
+        select.addOptions(filteredPlaylists.map((playlist) => new StringSelectMenuOptionBuilder()
           .setLabel(playlist.name)
           .setValue(playlist._id.toString())));
         const row = new ActionRowBuilder().addComponents(select);
@@ -67,6 +68,11 @@ module.exports = {
       }
 
       if (buttonInteraction.customId === 'new playlist') {
+        const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
+        if (playlists.length >= 25) {
+          await interaction.followUp('It is not possible to add another playlist, the limit is 25');
+          return;
+        }
         await connectionManager.addConnection(interaction, false);
         await buttonInteraction.update({ content: 'create new playlist', ephemeral: true, components: [] });
         await interaction.followUp('Let\'s get this party started!'); // todo fix duplicate message
