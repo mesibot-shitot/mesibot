@@ -1,13 +1,13 @@
-const { statHandler } = require('../DB/statHandler');
+const { StatHandler } = require('../DB/statHandler');
 const { Song } = require('../Song');
 
-class statRepository {
+class StatRepository {
   constructor() {
-    this.statStorage = new statHandler('statistics');
+    this.statStorage = new StatHandler('statistics');
   }
 
   createAction(stat) {
     return this.statStorage.createStat(stat);
   }
 }
-module.exports = statRepository;
+module.exports = StatRepository;

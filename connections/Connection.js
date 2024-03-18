@@ -2,11 +2,11 @@ const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
 const User = require('../User');
 const Playlist = require('../Playlist');
 const PlaylistRepository = require('../repository/playlistRepository');
-const statRepository = require('../repository/statRepository');
+const StatRepository = require('../repository/statRepository');
 const Song = require('../Song');
 
 const playlistDB = new PlaylistRepository();
-const statDB = new statRepository();
+const statDB = new StatRepository();
 class Connection {
   playlist = null;
 
@@ -26,31 +26,30 @@ class Connection {
     });
     const player = createAudioPlayer();
     this.connection.subscribe(player);
-    // todo change here when working on loading playlist from DB
+    const group = { id: interaction.guildId, owner: interaction.guild.ownerId };
     // todo check playlist parameters
     if (load) {
-      this.loadPlaylist(playlistId, player);
+      this.loadPlaylist(playlistId, group, player);
     } else {
-      const newPlaylist = await playlistDB.createPlaylist({ groupId: this.group, name: 'default', queue: [], playedList: [] });
+      const newPlaylist = await playlistDB.createPlaylist({
+        groupId: this.group, name: 'default', queue: [], playedList: [], owner: group.owner,
+      });
       const { _id } = newPlaylist;
-      this.playlist = new Playlist(player, this.group, _id);
+      await statDB.createAction({
+        groupId: this.group,
+        action: 'playlistCreated',
+        playlist: _id,
+      });
+      this.playlist = new Playlist(player, group, _id);
     }
     console.log(`Bot connected to #${this.group} group!`);
   }
 
-  getMembers(interaction) {
-    const { members } = interaction;
-    members.forEach((member) => { // todo add get user from DB
-      const user = new User({ id: member.id, name: member.user.username });
-
-      this.members.push(user);
-    });
-  }
-
-  async loadPlaylist(id, player) {
+  async loadPlaylist(id, group, player) {
     const imported = await playlistDB.getPlaylistById(id);
     if (imported?.queue) {
-      this.playlist = new Playlist(player, this.group, imported._id);
+      const { _id } = imported;
+      this.playlist = new Playlist(player, group, _id);
       imported.queue.forEach((song) => {
         const {
           title, url, thumbnail, duration, requestedBy, songId, priority, place,
@@ -62,16 +61,23 @@ class Connection {
       });
       this.playlist.playedList = imported.playedList;
       this.playlist.name = imported.name;
-      this.playlist.id = imported._id;
+      this.playlist.id = _id;
+      await statDB.createAction({
+        groupId: this.group,
+        action: 'playlistImported',
+        playlist: _id,
+      });
+      console.log(`Playlist '${imported.name}' loaded from DB`);
     } else {
       console.error('Could not load playlist from DB, playlist is empty or does not exist');
     }
   }
 
-  nornalizePlaylist() {
+  normalizePlaylist() {
     return {
       isDraft: false,
       groupId: this.group,
+      owner: this.playlist.owner,
       name: this.playlist.name,
       queue: this.playlist.queue._elements,
       playedList: this.playlist.playedList,
@@ -83,7 +89,7 @@ class Connection {
   }
 
   savePlaylist() {
-    return playlistDB.updatePlaylist(this.playlist.id, this.nornalizePlaylist());
+    return playlistDB.updatePlaylist(this.playlist.id, this.normalizePlaylist());
   }
 
   async fetchPlaylistName(name) {
@@ -91,7 +97,7 @@ class Connection {
   }
 
   async updatePlaylist() {
-    const newPlaylist = this.nornalizePlaylist();
+    const newPlaylist = this.normalizePlaylist();
     console.log(await playlistDB.updatePlaylist(this.playlist.id, newPlaylist));
   }
 

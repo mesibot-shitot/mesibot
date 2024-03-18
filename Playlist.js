@@ -1,5 +1,5 @@
 const PriorityQueue = require('priorityqueuejs');
-const statRepository = require('./repository/statRepository');
+const StatRepository = require('./repository/statRepository');
 
 const comparator = (songA, songB) => {
   const sum = songA.priority - songB.priority;
@@ -7,12 +7,13 @@ const comparator = (songA, songB) => {
   return sum;
 };
 
-const statDB = new statRepository();
+const statDB = new StatRepository();
 class Playlist {
   name = '';
 
-  constructor(player, groupID, id) {
-    this.groupID = groupID;
+  constructor(player, group, id) {
+    this.groupID = group.id;
+    this.owner = group.owner;
     this.id = id;
     this.queue = new PriorityQueue(comparator);
     this.playedList = [];
@@ -47,12 +48,12 @@ class Playlist {
         songTitle: song.title,
       },
       groupId: this.groupID,
-      action: 'add',
+      action: 'songAdded',
       playlist: this.id,
       user: {
         userId: song.requestedBy.userId,
         userName: song.requestedBy.userName,
-      }
+      },
     });
   }
 
@@ -75,9 +76,8 @@ class Playlist {
     this.current.Played = true;
     this.playedList.push(this.current);
     this.player.playing = true;
-    
   }
-  
+
   async skip() {
     this.nextSong();
     await statDB.createAction({
@@ -89,31 +89,12 @@ class Playlist {
       action: 'songSkip',
       playlist: this.id,
     });
-    
-  }
-
-  getQueue() {
-    return this.queue.slice(0, 10);
-  }
-
-  saveQueue() {
-    songDB.saveQueue(this.queue._elements);
-  }
-
-  // returns the current song
-  getCurrentSong() {
-    return this.queue[0];
-  }
-
-  // destroys the queue
-  destroy() {
-    this.queue = [];
   }
 
   async checkUserSkip(userId, userName) {
     if (this.current.getUserSkip(userId)) {
       return true;
-    } 
+    }
     await statDB.createAction({
       song: {
         songId: this.current.songId,
@@ -123,12 +104,11 @@ class Playlist {
       action: 'userSkip',
       playlist: this.id,
       user: {
-        userId: userId,
-        userName: userName,
+        userId,
+        userName,
       },
     });
     return false;
-
   }
 
   reorderQueue() {

@@ -53,7 +53,7 @@ module.exports = {
         return;
       }
       if (customId === 'save') {
-        if (!connection.playlist.name) {
+        if (connection.playlist.name === '' || connection.playlist.name === 'default') {
           const modal = new ModalBuilder()
             .setCustomId('Save Playlist')
             .setTitle('Save Playlist');

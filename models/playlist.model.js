@@ -5,6 +5,9 @@ const playlistSchema = new Schema({
     type: String,
     index: true,
   },
+  owner: {
+    type: String,
+  },
   name: {
     type: String,
     required: true,

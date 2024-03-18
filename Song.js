@@ -70,7 +70,6 @@ class Song {
 
     message = 'Vote registered';
     this.priority += newVote;
-    
     return message;
   }
 
