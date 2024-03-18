@@ -28,7 +28,7 @@ module.exports = {
     const { playlist } = connectionManager.findConnection(interaction.guildId);
     let songNum = interaction.options.getString('song-number');
     const queue = playlist.queue._elements;
-    if (songNum < 0 || songNum > playlist.queue.size() || isNaN(songNum)) {
+    if (songNum < 0 || songNum > playlist.queue.size() || Number.isNaN(songNum)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
     }
