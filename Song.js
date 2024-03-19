@@ -5,11 +5,12 @@ const user = require('./User');
 class Song {
   place = -1;
 
+  priority = 0;
+
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
+    title, url, thumbnail, duration, requestedBy, songId,
   }) {
     this.songId = songId;
-    this.priority = priority;
     this.title = title;
     this.url = url;
     this.thumbnail = thumbnail;
@@ -17,7 +18,7 @@ class Song {
     this.requestedBy = requestedBy;
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
-    this.skipc = [];//
+    this.skipc = [];
   }
 
   getResource() {
@@ -37,16 +38,32 @@ class Song {
     return this.skipc.find((skip) => skip.user === userID);
   }
 
-  // recalculatePriority(vote) { //todo: implement recalculatePriority, Add statistical priority
-  //   this.priority += vote;
-  // }
+  calculatePriority(stats, memberCount) { // todo: implement recalculatePriority, Add statistical priority
+    const statsActions = stats.reduce((groups, stat) => {
+      const { action, user } = stat;
+      if (!groups[action]) {
+        groups[action] = {
+          users: [],
+          count: 0,
+        };
+      }
+      if (!user) {
+        groups[action].count += 1;
+      } else if (!groups[action].users.includes(user.userId)) {
+        groups[action].users.push(user.userId);
+        groups[action].count += 1;
+      }
+      return groups;
+    }, {});
+    console.log(statsActions);
+  }
+
   disLikeCount() {
     const count = this.vote.filter((vote) => vote.vote === -1);
     return count.length;
   }
 
   setskip(interaction) {
-    // eslint-disable-next-line max-len
     const newUser = { user: interaction.user.id };
     this.skipc.push(newUser);
   }

@@ -11,5 +11,7 @@ class StatHandler {
   }
 
   createStat = (stat) => this.Model.create(stat);
+
+  getSongStatsByGroup = (groupId, songId) => this.Model.find({ groupId, 'song.songId': songId });
 }
 module.exports = { StatHandler };

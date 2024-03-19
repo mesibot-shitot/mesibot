@@ -2,9 +2,10 @@ const PriorityQueue = require('priorityqueuejs');
 const StatRepository = require('./repository/statRepository');
 
 const comparator = (songA, songB) => {
-  const sum = songA.priority - songB.priority;
-  if (!sum) return songB.place - songA.place;
-  return sum;
+  if (songA.priority === songB.priority) {
+    return songA.place < songB.place ? 1 : -1;
+  }
+  return songA.priority > songB.priority ? 1 : -1;
 };
 
 const statDB = new StatRepository();
@@ -38,6 +39,21 @@ class Playlist {
   pushToQueue(song) {
     song.place = this.queue.size() + this.playedList.length;
     this.queue.enq(song);
+  }
+
+  async newSong(song, memberCount) {
+    try {
+      const stats = await statDB.fetchSongStatsByGroup(this.groupID, song.songId);
+      if (!stats) {
+        await this.addTrack(song);
+        return;
+      }
+      song.calculatePriority(stats, memberCount);
+
+      // console.log(stats);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async addTrack(song) {
@@ -114,6 +130,7 @@ class Playlist {
   reorderQueue() {
     const newQueue = new PriorityQueue(comparator);
     while (!this.queue.isEmpty()) {
+      console.log('===\n', this.queue.peek().title, this.queue.peek().priority, this.queue.peek().place, '\n===');
       newQueue.enq(this.queue.deq());
     }
     this.queue = newQueue;
@@ -130,6 +147,7 @@ class Playlist {
       playlist: this.id,
     });
   }
+
   async voteSong(song, userId, action) {
     return statDB.createAction({
       song: {

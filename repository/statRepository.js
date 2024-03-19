@@ -9,5 +9,9 @@ class StatRepository {
   createAction(stat) {
     return this.statStorage.createStat(stat);
   }
+
+  fetchSongStatsByGroup(groupId, songId) {
+    return this.statStorage.getSongStatsByGroup(groupId, songId);
+  }
 }
 module.exports = StatRepository;
