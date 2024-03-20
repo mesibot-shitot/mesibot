@@ -130,6 +130,7 @@ class Playlist {
       playlist: this.id,
     });
   }
+
   async voteSong(song, userId, action) {
     return statDB.createAction({
       song: {

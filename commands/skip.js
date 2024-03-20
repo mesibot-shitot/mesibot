@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
     playlist.current.setskip(interaction);
-    if ((playlist.current.skipc.length) >= Math.ceil(channel.members.size / 2)) {
+    if ((playlist.current.skipc.length) >= Math.floor(channel.members.size / 2)) {
       playlist.skip();
       embed.setTitle('skipped');
       embed.setDescription(`now playing **${playlist.current.title}**`);
@@ -36,7 +36,7 @@ module.exports = {
       return;
     }
     const sum = Math.ceil((channel.members.size / 2) - (playlist.current.skipc.length));
-    await interaction.reply(`You need ${sum} more members to skip this song`);
+    await interaction.reply({ content: `You need ${sum} more members to skip this song`, ephemeral: true });
   },
 
 };

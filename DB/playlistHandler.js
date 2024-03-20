@@ -19,10 +19,12 @@ class playlistHandler {
   createPlaylist = (Playlist) => this.Model.create(Playlist);
 
   getGroupPlaylists = (groupId) => this.Model.find({ groupId });
+
   getGroupsActivePlaylists = (groupId) => this.Model.find({ groupId, isDraft: false });
+
   putPlaylist = (_id, playlist) => this.Model.updateOne({ _id }, playlist);
 
-  deletePlaylist = (playlistId) => this.Model.deleteOne({ playlistId: Playlist });
+  deletePlaylist = (playlistId) => this.Model.deleteOne({ _id: playlistId });
 
   existPlaylist = (playlistID) => this.Model.exists({ playlistID: Playlist });
 }

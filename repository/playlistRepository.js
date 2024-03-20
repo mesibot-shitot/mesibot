@@ -5,7 +5,7 @@ class PlaylistRepository {
   constructor() {
     this.playlistStorage = new playlistHandler('playlist');
   }
-  
+
   fetchGroupPlaylists(id) {
     return this.playlistStorage.getGroupPlaylists(id);
   }
@@ -13,7 +13,7 @@ class PlaylistRepository {
   fetchGroupsActivePlaylists(id) {
     return this.playlistStorage.getGroupsActivePlaylists(id);
   }
-  
+
   getPlaylistById(playlistId) {
     return this.playlistStorage.getPlaylistById(playlistId);
   }
@@ -31,7 +31,7 @@ class PlaylistRepository {
   }
 
   deletePlaylist(playlistId) {
-    return this.playlistStorage.deletePlaylist({ playlistId: Playlist });
+    return this.playlistStorage.deletePlaylist(playlistId);
   }
 
   playlistExist(playlistID) {

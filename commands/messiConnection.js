@@ -72,15 +72,13 @@ module.exports = {
       }
 
       if (buttonInteraction.customId === 'new playlist') {
-        const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
-        if (playlists.length >= 25) {
-          await interaction.followUp('It is not possible to add another playlist, the limit is 25');
-          return;
-        }
         await connectionManager.addConnection(interaction, false);
         await buttonInteraction.update({ content: 'create new playlist', ephemeral: true, components: [] });
         await interaction.followUp('Let\'s get this party started!'); // todo fix duplicate message
       }
+    });
+    collector.on('end', async () => {
+      await interaction.editReply({ content: 'Action Timed Out', components: [] });
     });
   },
 };

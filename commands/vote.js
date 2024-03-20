@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
   MessageActionRow, MessageButton, EmbedBuilder, VoiceChannel,
 } = require('discord.js');
+const { connection } = require('mongoose');
 const Playlist = require('../Playlist');
 const Song = require('../Song');
-const { connection } = require('mongoose');
 
 const VOTE = {
   UP: 1,
@@ -30,7 +30,7 @@ module.exports = {
     const connection = connectionManager.findConnection(interaction.guildId);
     const { playlist } = connection;
     let songNum = interaction.options.getString('song-number');
-    //const queue = playlist.queue._elements;
+    // const queue = playlist.queue._elements;
     if (songNum < 0 || songNum > playlist.queue.size() || Number.isNaN(songNum)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;

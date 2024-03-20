@@ -93,11 +93,15 @@ class Connection {
     await this.savePlaylistStat();
   }
 
+  async deletePlaylist(id) {
+    await playlistDB.deletePlaylist(id);
+  }
+
   async fetchPlaylistName(name) {
     return playlistDB.fetchGroupPlaylist(this.group, name);
   }
 
-  async savePlaylistStat(){
+  async savePlaylistStat() {
     return statDB.createAction({
       groupId: this.group,
       action: 'playlistSaved',
@@ -109,7 +113,7 @@ class Connection {
     this.connection.destroy();
   }
 
-  async discardPlaylist(){
+  async discardPlaylist() {
     return statDB.createAction({
       groupId: this.group,
       action: 'playlistDiscarded',
@@ -120,7 +124,7 @@ class Connection {
   async removeSongFromPlaylist(songNum) {
     const queue = this.playlist.queue._elements;
     const name = queue[songNum].title;
-    const songId = queue[songNum].songId;
+    const { songId } = queue[songNum];
     queue.splice(songNum, 1);
     return this.playlist.songRemoved(name, songId);
   }

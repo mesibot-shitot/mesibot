@@ -1,6 +1,6 @@
 const {
   SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder, ModalBuilder,
-  TextInputBuilder, TextInputStyle,
+  TextInputBuilder, TextInputStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
 } = require('discord.js');
 const { handleModalSubmit } = require('../handlers/modalHendler');
 
@@ -16,7 +16,10 @@ const dontSave = new ButtonBuilder()
   .setCustomId('dont save')
   .setLabel('Dont Save')
   .setStyle(ButtonStyle.Danger);
-
+const deleteplaylist = new ButtonBuilder()
+  .setCustomId('delete playlist')
+  .setLabel('Delete Playlist')
+  .setStyle(ButtonStyle.Danger);
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('exit')
@@ -33,14 +36,25 @@ module.exports = {
       return;
     }
 
-    const row = new ActionRowBuilder()
+    const buttonRow = new ActionRowBuilder()
       .addComponents(cancel, dontSave, save);
-
-    const userChoice = await interaction.reply({
-      content: 'Do you want to save the playlist?',
-      components: [row],
-      ephemeral: true,
-    });
+    const buttonRow2 = new ActionRowBuilder()
+      .addComponents(cancel, deleteplaylist);
+    const playlists = await connectionManager.fetchGroupPlaylists(interaction.guildId);
+    let userChoice;
+    if (playlists.length >= 25) {
+      userChoice = await interaction.reply({
+        content: 'It is not possible to add another playlist, the limit is 25,you can delete playlist ',
+        components: [buttonRow2],
+        ephemeral: true,
+      });
+    } else {
+      userChoice = await interaction.reply({
+        content: 'Do you want to save the playlist?',
+        components: [buttonRow],
+        ephemeral: true,
+      });
+    }
     const collector = userChoice.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 15000,
@@ -52,6 +66,32 @@ module.exports = {
         await buttonInteraction.update({ content: 'Ho You\'re Staying! How Fun  :partying_face: ', components: [] });
         return;
       }
+      if (customId === 'delete playlist') {
+        const select = new StringSelectMenuBuilder();
+        select.setCustomId('playlist');
+        select.setPlaceholder('Select a playlist');
+        if (!playlists.length) {
+          await buttonInteraction.update({ content: 'No playlists found  :x: ', ephemeral: true, components: [] });
+          return;
+        }
+        const filteredPlaylists = playlists.filter((playlist) => playlist.name !== '');
+        select.addOptions(filteredPlaylists.map((playlist) => new StringSelectMenuOptionBuilder()
+          .setLabel(playlist.name)
+          .setValue(playlist._id.toString())));
+        const row = new ActionRowBuilder().addComponents(select);
+        const reply = await buttonInteraction.update({ content: 'Please select a playlist:', components: [row], ephemeral: true });
+        const selectCollector = reply.createMessageComponentCollector({
+          componentType: ComponentType.StringSelect,
+          time: 15000,
+        });
+        selectCollector.on('collect', async (selectInteraction) => {
+          const playlistIdToDelete = selectInteraction.values[0];
+          await connection.deletePlaylist(playlistIdToDelete);
+          await selectInteraction.update({ content: 'Playlist deleted', ephemeral: true, components: [] });
+        });
+        return;
+      }
+
       if (customId === 'save') {
         if (connection.playlist.name === '' || connection.playlist.name === 'default') {
           const modal = new ModalBuilder()
@@ -89,10 +129,8 @@ module.exports = {
       connectionManager.removeConnection(interaction.guildId);
       await buttonInteraction.update({ content, components: [] });
     });
-    collector.on('end', async (collected) => {
-      if (collected.size === 0) {
-        await interaction.editReply({ content: 'Action Timed Out', components: [] });
-      }
+    collector.on('end', async () => {
+      await interaction.editReply({ content: 'Action Timed Out', components: [] });
     });
   },
 };

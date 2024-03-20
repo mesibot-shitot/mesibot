@@ -55,11 +55,15 @@ module.exports = {
         const duration = topResults[index].length.simpleText;
         const requestedBy = { userId: member.user.id, userName: member.user.username };
         const newSong = new Song({
+          // eslint-disable-next-line max-len
           title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, priority: 0,
         });
         playlist.addTrack(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();
+      });
+      collector.on('end', async () => {
+        await interaction.editReply({ content: 'Action Timed Out', components: [] });
       });
     } catch (error) {
       console.error('Error playing song:', error);
