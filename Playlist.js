@@ -2,11 +2,11 @@ const PriorityQueue = require('priorityqueuejs');
 const StatRepository = require('./repository/statRepository');
 
 const comparator = (songA, songB) => {
-  const sum = songA.priority - songB.priority;
-  if (!sum) return songB.place - songA.place;
-  return sum;
+  if (songA.priority === songB.priority) {
+    return songA.place < songB.place ? 1 : -1;
+  }
+  return (songA.priority > songB.priority ? 1 : -1);
 };
-
 const statDB = new StatRepository();
 class Playlist {
   name = '';
@@ -38,6 +38,20 @@ class Playlist {
   pushToQueue(song) {
     song.place = this.queue.size() + this.playedList.length;
     this.queue.enq(song);
+  }
+
+  async newSong(song) {
+    try {
+      const stats = await statDB.fetchSongStatsByGroup(this.groupID, song.songId);
+      if (!stats) {
+        await this.addTrack(song);
+        return;
+      }
+      song.calculatePriority(stats);
+      await this.addTrack(song);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async addTrack(song) {
@@ -91,6 +105,13 @@ class Playlist {
     });
   }
 
+  getPlace = (place) => {
+    const { _elements } = this.queue;
+    return _elements.find((song) => song.place === Number(place));
+  };
+
+  getIndex = (songId) => this.queue._elements.findIndex((song) => song.songId === songId);
+
   async checkUserSkip(userId, userName) {
     if (this.current.getUserSkip(userId)) {
       return true;
@@ -119,11 +140,16 @@ class Playlist {
     this.queue = newQueue;
   }
 
-  async songRemoved(songTitle, songId) {
+  async removeByPlace(place) {
+    const songToDelete = this.getPlace(place);
+    if (!songToDelete) throw new Error('Song not found');
+    const { title } = songToDelete;
+    this.queue._elements.splice(this.getIndex(songToDelete.songId), 1);
+    console.log(title);
     return statDB.createAction({
       song: {
-        songId,
-        songTitle,
+        songId: songToDelete.songId,
+        songTitle: songToDelete.title,
       },
       groupId: this.groupID,
       action: 'songRemoved',
@@ -131,19 +157,48 @@ class Playlist {
     });
   }
 
-  async voteSong(song, userId, action) {
-    return statDB.createAction({
+  async voteForSong(songPlace, userId, newVote) {
+    const song = this.getPlace(songPlace);
+    if (!song) throw new Error('Song not found');
+    const existingUser = song.getUserVote(userId);
+    if (existingUser) {
+      if (existingUser.vote === newVote) {
+        return 0;
+      }
+      const { actionId } = existingUser;
+      existingUser.vote = newVote;
+      song.changeVote(newVote);
+      const updated = await this.voteStat(song, userId, newVote, actionId, false);
+      const { _id } = updated;
+      if (!_id) throw new Error('Failed to update vote stat'); // todo throw error
+      existingUser.actionId = _id;
+      return -1;
+    }
+
+    const id = await this.voteStat(song, userId, newVote, null);
+    const newUser = { user: userId, vote: newVote, actionId: id };
+    song.setVote(newUser, newVote);
+    return 1;
+  }
+
+  async voteStat(song, userId, vote, id, newVote = true) {
+    const stat = {
       song: {
         songId: song.songId,
         songTitle: song.title,
       },
       groupId: this.groupID,
-      action,
+      action: vote === 1 ? 'upVote' : 'downVote',
       playlist: this.id,
       user: {
         userId,
       },
-    });
+    };
+
+    if (newVote) return statDB.createAction(stat);
+    const res = await statDB.updateAction(id, stat);
+    if (!res.acknowledged) throw new Error('Failed to update vote stat');
+    return { _id: id };
   }
 }
 

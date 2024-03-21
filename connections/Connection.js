@@ -1,5 +1,4 @@
 const { joinVoiceChannel, createAudioPlayer } = require('@discordjs/voice');
-const User = require('../User');
 const Playlist = require('../Playlist');
 const PlaylistRepository = require('../repository/playlistRepository');
 const StatRepository = require('../repository/statRepository');
@@ -121,21 +120,16 @@ class Connection {
     });
   }
 
-  async removeSongFromPlaylist(songNum) {
-    const queue = this.playlist.queue._elements;
-    const name = queue[songNum].title;
-    const { songId } = queue[songNum];
-    queue.splice(songNum, 1);
-    return this.playlist.songRemoved(name, songId);
+  async removeSongFromPlaylist(songPlace) {
+    return this.playlist.removeByPlace(songPlace);
   }
 
-  getSongByIndex(index) {
-    return this.playlist.queue._elements[index];// todo throw error
+  getSongByPlace(place) {
+    return this.playlist.getPlace(place);
   }
 
-  async voteSong(song, userId, vote) {
-    const action = vote === 1 ? 'upVote' : 'downVote';
-    return this.playlist.voteSong(song, userId, action);
+  async voteSong(songPlace, userId, vote) {
+    return this.playlist.voteForSong(songPlace, userId, vote);// todo try catch
   }
 }
 module.exports = Connection;

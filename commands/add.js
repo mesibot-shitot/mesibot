@@ -14,7 +14,8 @@ module.exports = {
       .setDescription('The name of the song to play.')
       .setRequired(true)),
   execute: async ({ interaction, connectionManager }) => {
-    const { playlist } = connectionManager.findConnection(interaction.guildId);
+    const connection = connectionManager.findConnection(interaction.guildId);
+    const { playlist } = connection;
     const songName = interaction.options.getString('song');
     const member = await interaction.guild.members.fetch(interaction.user.id);
     if (!songName) {
@@ -40,7 +41,7 @@ module.exports = {
         componentType: ComponentType.Button,
         time: 15000,
       });
-      collector.on('collect', (buttonInteraction) => {
+      collector.on('collect', async (buttonInteraction) => {
         if (playlist.queue.size() === 20) {
           const embed = new EmbedBuilder();
           embed.setTitle('Playlist is full, songs cannot be added');
@@ -55,10 +56,9 @@ module.exports = {
         const duration = topResults[index].length.simpleText;
         const requestedBy = { userId: member.user.id, userName: member.user.username };
         const newSong = new Song({
-          // eslint-disable-next-line max-len
-          title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId, priority: 0,
+          title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId,
         });
-        playlist.addTrack(newSong);
+        await playlist.newSong(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();
       });

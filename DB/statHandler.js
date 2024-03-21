@@ -11,5 +11,9 @@ class StatHandler {
   }
 
   createStat = (stat) => this.Model.create(stat);
+
+  putStat = (_id, stat) => this.Model.updateOne({ _id }, stat);
+
+  getSongStatsByGroup = (groupId, songId) => this.Model.find({ groupId, 'song.songId': songId });
 }
 module.exports = { StatHandler };

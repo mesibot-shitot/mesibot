@@ -1,16 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const {
-  MessageActionRow, MessageButton, EmbedBuilder, VoiceChannel,
-} = require('discord.js');
-const { connection } = require('mongoose');
-const Playlist = require('../Playlist');
-const Song = require('../Song');
 
 const VOTE = {
   UP: 1,
   DOWN: -1,
 };
-module.exports = {
+const setVote = async (interaction, song, connection) => {
+  const voteExtract = interaction.options.getString('vote');
+  const newVote = VOTE[voteExtract];
+  const action = await connection.voteSong(song, interaction.user.id, newVote);
+  if (!action) return 'You already voted for this song';
+  if (action < 0) return 'You have changed your vote';
+  return 'Vote registered';
+};
+const command = {
   data: new SlashCommandBuilder()
     .setName('vote')
     .setDescription('Choose song to Upvote or Downvote.')
@@ -29,20 +31,17 @@ module.exports = {
   execute: async ({ interaction, connectionManager }) => {
     const connection = connectionManager.findConnection(interaction.guildId);
     const { playlist } = connection;
-    let songNum = interaction.options.getString('song-number');
-    // const queue = playlist.queue._elements;
-    if (songNum < 0 || songNum > playlist.queue.size() || Number.isNaN(songNum)) {
+    const songPlace = interaction.options.getString('song-number');
+    if (songPlace < 0 || songPlace > playlist.queue.size() + playlist.playedList.length || Number.isNaN(songPlace)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
     }
-    songNum -= 1;
-
     try {
-      const song = connection.getSongByIndex(songNum);
-      const message = await setVote(interaction, song, connection);
+      const song = connection.getSongByPlace(songPlace);
+      const message = await setVote(interaction, songPlace, connection);
       const { channel } = interaction.member.voice;
       if ((song.disLikeCount()) === Math.ceil(channel.members.size / 2)) {
-        await connection.removeSongFromPlaylist(songNum);
+        await connection.removeSongFromPlaylist(songPlace);
         await interaction.reply(`${song.title} was removed from queue`);
       } else {
         interaction.reply({ content: `${message}`, ephemeral: true });
@@ -53,28 +52,4 @@ module.exports = {
     }
   },
 };
-const setVote = async (interaction, song, connection) => {
-  const existingUser = song.getUserVote(interaction.user.id);
-  const voteExtract = interaction.options.getString('vote');
-  const newVote = VOTE[voteExtract];
-  let message;
-  if (existingUser) {
-    if (existingUser.vote === newVote) {
-      message = 'You already voted for this song'; // todo pop user out of vote list as if he never voted
-      return message;
-    }
-    existingUser.vote = newVote;
-    message = 'You have changed your vote';
-    song.priority += (newVote * 2);
-    await connection.voteSong(song, interaction.user.id, newVote);
-    return message;
-  }
-  // eslint-disable-next-line max-len
-  const newUser = { user: interaction.user.id, vote: newVote }; // todo: check if this is the right way to get the user id
-  song.vote.push(newUser);
-
-  message = 'Vote registered';
-  song.priority += newVote;
-  await connection.voteSong(song, interaction.user.id, newVote);
-  return message;
-};
+module.exports = command;
