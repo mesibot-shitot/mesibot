@@ -62,7 +62,6 @@ class Song {
       } else groups[action].count += 1;
       return groups;
     }, {});
-    console.log(statsActions);
     this.calculateSongPriority(statsActions);
   }
 

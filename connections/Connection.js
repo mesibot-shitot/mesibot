@@ -117,20 +117,16 @@ class Connection {
     });
   }
 
-  async removeSongFromPlaylist(songNum) {
-    const queue = this.playlist.queue._elements;
-    const name = queue[songNum].title;
-    const { songId } = queue[songNum];
-    queue.splice(songNum, 1);
-    return this.playlist.songRemoved(name, songId);
+  async removeSongFromPlaylist(songPlace) {
+    return this.playlist.removeByPlace(songPlace);
   }
 
-  getSongByIndex(index) {
-    return this.playlist.queue._elements[index];// todo throw error
+  getSongByPlace(place) {
+    return this.playlist.getPlace(place);
   }
 
-  async voteSong(songNum, userId, vote) {
-    return this.playlist.voteForSong(songNum, userId, vote);// todo try catch
+  async voteSong(songPlace, userId, vote) {
+    return this.playlist.voteForSong(songPlace, userId, vote);// todo try catch
   }
 }
 module.exports = Connection;

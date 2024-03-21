@@ -105,6 +105,13 @@ class Playlist {
     });
   }
 
+  getPlace = (place) => {
+    const { _elements } = this.queue;
+    return _elements.find((song) => song.place === Number(place));
+  };
+
+  getIndex = (songId) => this.queue._elements.findIndex((song) => song.songId === songId);
+
   async checkUserSkip(userId, userName) {
     if (this.current.getUserSkip(userId)) {
       return true;
@@ -133,11 +140,16 @@ class Playlist {
     this.queue = newQueue;
   }
 
-  async songRemoved(songTitle, songId) {
+  async removeByPlace(place) {
+    const songToDelete = this.getPlace(place);
+    if (!songToDelete) throw new Error('Song not found');
+    const { title } = songToDelete;
+    this.queue._elements.splice(this.getIndex(songToDelete.songId), 1);
+    console.log(title);
     return statDB.createAction({
       song: {
-        songId,
-        songTitle,
+        songId: songToDelete.songId,
+        songTitle: songToDelete.title,
       },
       groupId: this.groupID,
       action: 'songRemoved',
@@ -145,9 +157,9 @@ class Playlist {
     });
   }
 
-  async voteForSong(songNum, userId, newVote) {
-    const { _elements } = this.queue;
-    const song = _elements[songNum];
+  async voteForSong(songPlace, userId, newVote) {
+    const song = this.getPlace(songPlace);
+    if (!song) throw new Error('Song not found');
     const existingUser = song.getUserVote(userId);
     if (existingUser) {
       if (existingUser.vote === newVote) {

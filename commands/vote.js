@@ -31,19 +31,17 @@ const command = {
   execute: async ({ interaction, connectionManager }) => {
     const connection = connectionManager.findConnection(interaction.guildId);
     const { playlist } = connection;
-    let songNum = interaction.options.getString('song-number');
-    if (songNum < 0 || songNum > playlist.queue.size() || Number.isNaN(songNum)) {
+    const songPlace = interaction.options.getString('song-number');
+    if (songPlace < 0 || songPlace > playlist.queue.size() + playlist.playedList.length || Number.isNaN(songPlace)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
     }
-    songNum -= 1;
-
     try {
-      const song = connection.getSongByIndex(songNum);
-      const message = await setVote(interaction, songNum, connection);
+      const song = connection.getSongByPlace(songPlace);
+      const message = await setVote(interaction, songPlace, connection);
       const { channel } = interaction.member.voice;
       if ((song.disLikeCount()) === Math.ceil(channel.members.size / 2)) {
-        await connection.removeSongFromPlaylist(songNum);
+        await connection.removeSongFromPlaylist(songPlace);
         await interaction.reply(`${song.title} was removed from queue`);
       } else {
         interaction.reply({ content: `${message}`, ephemeral: true });
