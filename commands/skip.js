@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
     playlist.current.setskip(interaction);
-    if ((playlist.current.skipc.length) >= Math.ceil(channel.members.size / 2)) {
+    if ((playlist.current.skipc.length) >= Math.floor(channel.members.size / 2)) {
       playlist.skip();
       embed.setTitle('skipped');
       embed.setDescription(`now playing **${playlist.current.title}**`);

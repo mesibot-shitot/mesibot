@@ -10,6 +10,10 @@ class StatRepository {
     return this.statStorage.createStat(stat);
   }
 
+  updateAction(id, stat) {
+    return this.statStorage.putStat(id, stat);
+  }
+
   fetchSongStatsByGroup(groupId, songId) {
     return this.statStorage.getSongStatsByGroup(groupId, songId);
   }

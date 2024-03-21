@@ -20,7 +20,7 @@ class Connection {
 
   async createConnection(interaction, load = false, playlistId = null) {
     this.connection = joinVoiceChannel({
-      channelId: interaction.channel.id,
+      channelId: interaction.member.voice.channelId,
       guildId: interaction.guildId,
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
@@ -97,7 +97,7 @@ class Connection {
     return playlistDB.fetchGroupPlaylist(this.group, name);
   }
 
-  async savePlaylistStat(){
+  async savePlaylistStat() {
     return statDB.createAction({
       groupId: this.group,
       action: 'playlistSaved',
@@ -109,7 +109,7 @@ class Connection {
     this.connection.destroy();
   }
 
-  async discardPlaylist(){
+  async discardPlaylist() {
     return statDB.createAction({
       groupId: this.group,
       action: 'playlistDiscarded',
@@ -120,7 +120,7 @@ class Connection {
   async removeSongFromPlaylist(songNum) {
     const queue = this.playlist.queue._elements;
     const name = queue[songNum].title;
-    const songId = queue[songNum].songId;
+    const { songId } = queue[songNum];
     queue.splice(songNum, 1);
     return this.playlist.songRemoved(name, songId);
   }
@@ -129,9 +129,8 @@ class Connection {
     return this.playlist.queue._elements[index];// todo throw error
   }
 
-  async voteSong(song, userId, vote) {
-    const action = vote === 1 ? 'upVote' : 'downVote';
-    return this.playlist.voteSong(song, userId, action);
+  async voteSong(songNum, userId, vote) {
+    return this.playlist.voteForSong(songNum, userId, vote);// todo try catch
   }
 }
 module.exports = Connection;

@@ -58,8 +58,7 @@ module.exports = {
         const newSong = new Song({
           title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId,
         });
-        const a = await playlist.newSong(newSong, interaction.guild.memberCount);
-        console.log(a);
+        await playlist.newSong(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
         playlist.reorderQueue();
       });

@@ -5,9 +5,8 @@ const comparator = (songA, songB) => {
   if (songA.priority === songB.priority) {
     return songA.place < songB.place ? 1 : -1;
   }
-  return songA.priority > songB.priority ? 1 : -1;
+  return (songA.priority > songB.priority ? 1 : -1);
 };
-
 const statDB = new StatRepository();
 class Playlist {
   name = '';
@@ -41,16 +40,15 @@ class Playlist {
     this.queue.enq(song);
   }
 
-  async newSong(song, memberCount) {
+  async newSong(song) {
     try {
       const stats = await statDB.fetchSongStatsByGroup(this.groupID, song.songId);
       if (!stats) {
         await this.addTrack(song);
         return;
       }
-      song.calculatePriority(stats, memberCount);
-
-      // console.log(stats);
+      song.calculatePriority(stats);
+      await this.addTrack(song);
     } catch (error) {
       console.log(error);
     }
@@ -130,7 +128,6 @@ class Playlist {
   reorderQueue() {
     const newQueue = new PriorityQueue(comparator);
     while (!this.queue.isEmpty()) {
-      console.log('===\n', this.queue.peek().title, this.queue.peek().priority, this.queue.peek().place, '\n===');
       newQueue.enq(this.queue.deq());
     }
     this.queue = newQueue;
@@ -148,19 +145,48 @@ class Playlist {
     });
   }
 
-  async voteSong(song, userId, action) {
-    return statDB.createAction({
+  async voteForSong(songNum, userId, newVote) {
+    const { _elements } = this.queue;
+    const song = _elements[songNum];
+    const existingUser = song.getUserVote(userId);
+    if (existingUser) {
+      if (existingUser.vote === newVote) {
+        return 0;
+      }
+      const { actionId } = existingUser;
+      existingUser.vote = newVote;
+      song.changeVote(newVote);
+      const updated = await this.voteStat(song, userId, newVote, actionId, false);
+      const { _id } = updated;
+      if (!_id) throw new Error('Failed to update vote stat'); // todo throw error
+      existingUser.actionId = _id;
+      return -1;
+    }
+
+    const id = await this.voteStat(song, userId, newVote, null);
+    const newUser = { user: userId, vote: newVote, actionId: id };
+    song.setVote(newUser, newVote);
+    return 1;
+  }
+
+  async voteStat(song, userId, vote, id, newVote = true) {
+    const stat = {
       song: {
         songId: song.songId,
         songTitle: song.title,
       },
       groupId: this.groupID,
-      action,
+      action: vote === 1 ? 'upVote' : 'downVote',
       playlist: this.id,
       user: {
         userId,
       },
-    });
+    };
+
+    if (newVote) return statDB.createAction(stat);
+    const res = await statDB.updateAction(id, stat);
+    if (!res.acknowledged) throw new Error('Failed to update vote stat');
+    return { _id: id };
   }
 }
 
