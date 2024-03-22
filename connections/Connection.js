@@ -31,7 +31,11 @@ class Connection {
       this.loadPlaylist(playlistId, group, player);
     } else {
       const newPlaylist = await playlistDB.createPlaylist({
-        groupId: this.group, name: 'default', queue: [], playedList: [], owner: group.owner,
+        groupId: this.group,
+        name: 'default',
+        queue: [],
+        playedList: [],
+        owner: group.owner,
       });
       const { _id } = newPlaylist;
       await statDB.createAction({
@@ -49,12 +53,27 @@ class Connection {
     if (imported?.queue) {
       const { _id } = imported;
       this.playlist = new Playlist(player, group, _id);
+      console.log('imported queue', imported.queue);
       imported.queue.forEach((song) => {
         const {
-          title, url, thumbnail, duration, requestedBy, songId, priority, place,
+          title,
+          url,
+          thumbnail,
+          duration,
+          requestedBy,
+          songId,
+          priority,
+          place,
         } = song;
         const newSong = new Song({
-          title, url, thumbnail, duration, requestedBy, songId, priority, place,
+          title,
+          url,
+          thumbnail,
+          duration,
+          requestedBy,
+          songId,
+          priority,
+          place,
         });
         this.playlist.pushToQueue(newSong);
       });
@@ -129,7 +148,7 @@ class Connection {
   }
 
   async voteSong(songPlace, userId, vote) {
-    return this.playlist.voteForSong(songPlace, userId, vote);// todo try catch
+    return this.playlist.voteForSong(songPlace, userId, vote); // todo try catch
   }
 }
 module.exports = Connection;

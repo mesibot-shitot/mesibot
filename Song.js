@@ -4,10 +4,8 @@ const { createAudioResource } = require('@discordjs/voice');
 class Song {
   place = -1;
 
-  priority = 0;
-
   constructor({
-    title, url, thumbnail, duration, requestedBy, songId,
+    title, url, thumbnail, duration, requestedBy, songId, priority = 0,
   }) {
     this.songId = songId;
     this.title = title;
@@ -18,6 +16,7 @@ class Song {
     this.Played = false;
     this.vote = []; // name of the user who voted and what they voted
     this.skipc = [];
+    this.priority = priority;
   }
 
   getResource() {
@@ -70,6 +69,7 @@ class Song {
     let totalWeight = 0;
 
     const weights = {
+      songPlaying: 1,
       songAdded: 0.5,
       upVote: 1,
       downVote: -1,

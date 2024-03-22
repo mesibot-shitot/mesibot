@@ -7,12 +7,15 @@ module.exports = {
     .setDescription('show the first 10 songs in the queue.'),
   execute: async ({ interaction, connectionManager }) => {
     const { playlist } = connectionManager.findConnection(interaction.guildId);
+    playlist.reorderQueue();
     const queue = playlist.queue._elements;
     const songList = [];
     let index = 1;
     queue.forEach((song) => {
       const newSong = {
-        name: `${index}.  ${song.title}`, value: `added by: ${song.requestedBy.userName}\nVote Number: ${song.place}`, inline: false,
+        name: `${index}.  ${song.title}`,
+        value: `added by: ${song.requestedBy.userName}\nVote Number: ${song.place}`,
+        inline: false,
       };
       index += 1;
       songList.push(newSong);

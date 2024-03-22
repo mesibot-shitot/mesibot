@@ -8,7 +8,7 @@ const statisticsSchema = new Schema({
     userName: { type: String },
   },
   playlist: { type: Schema.Types.ObjectId, ref: 'playlist' },
-  action: { type: String, required: true, enum: ['songAdded', 'downVote', 'upVote', 'songSkip', 'userSkip', 'playlistSaved', 'playlistImported', 'playlistCreated', 'songRemoved', 'playlistDiscarded'] },
+  action: { type: String, required: true, enum: ['songPlaying', 'songAdded', 'downVote', 'upVote', 'songSkip', 'userSkip', 'playlistSaved', 'playlistImported', 'playlistCreated', 'songRemoved', 'playlistDiscarded'] },
   song: {
     songId: { type: String },
     songTitle: { type: String },

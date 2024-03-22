@@ -1,5 +1,10 @@
 const {
-  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder,
+  SlashCommandBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+  ComponentType,
+  EmbedBuilder,
 } = require('discord.js');
 // const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
@@ -56,11 +61,15 @@ module.exports = {
         const duration = topResults[index].length.simpleText;
         const requestedBy = { userId: member.user.id, userName: member.user.username };
         const newSong = new Song({
-          title, url, thumbnail: thumbnail.thumbnails[0].url, duration, requestedBy, songId,
+          title,
+          url,
+          thumbnail: thumbnail.thumbnails[0].url,
+          duration,
+          requestedBy,
+          songId,
         });
         await playlist.newSong(newSong);
         buttonInteraction.reply(`**${topResults[index].title}** Was Added To The Playlist`);
-        playlist.reorderQueue();
       });
       collector.on('end', async () => {
         await interaction.editReply({ content: 'Action Timed Out', components: [] });

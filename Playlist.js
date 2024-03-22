@@ -71,25 +71,32 @@ class Playlist {
     });
   }
 
-  // plays the next song in the queue
   playSong() {
-    if (this.current?.getPlayed()) {
+    if (this.current && this.current.getPlayed()) {
       this.player.unpause();
       return;
     }
     this.nextSong();
   }
 
-  nextSong() {
+  async nextSong() {
     if (this.queue.isEmpty()) {
       return;
     }
     this.current = this.queue.deq();
-    this.reorderQueue();
     this.player.play(this.current.getResource());
     this.current.Played = true;
     this.playedList.push(this.current);
     this.player.playing = true;
+    await statDB.createAction({
+      song: {
+        songId: this.current.songId,
+        songTitle: this.current.title,
+      },
+      groupId: this.groupID,
+      action: 'songPlaying',
+      playlist: this.id,
+    });
   }
 
   async skip() {
@@ -135,7 +142,8 @@ class Playlist {
   reorderQueue() {
     const newQueue = new PriorityQueue(comparator);
     while (!this.queue.isEmpty()) {
-      newQueue.enq(this.queue.deq());
+      const currSong = this.queue.deq();
+      newQueue.enq(currSong);
     }
     this.queue = newQueue;
   }
@@ -145,7 +153,6 @@ class Playlist {
     if (!songToDelete) throw new Error('Song not found');
     const { title } = songToDelete;
     this.queue._elements.splice(this.getIndex(songToDelete.songId), 1);
-    console.log(title);
     return statDB.createAction({
       song: {
         songId: songToDelete.songId,
