@@ -1,8 +1,6 @@
-const mongoose = require('mongoose');
 const Path = require('path');
-const { config } = require('dotenv');
+require('dotenv').config();
 const Playlist = require('../Playlist');
-const DbConnection = require('./DbConnection');
 
 class playlistHandler {
   constructor(entity) {

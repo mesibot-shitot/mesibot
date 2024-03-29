@@ -1,8 +1,5 @@
-const mongoose = require('mongoose');
 const Path = require('path');
-const { config } = require('dotenv');
-const Song = require('../Song');
-const DbConnection = require('./DbConnection');
+require('dotenv').config();
 
 class StatHandler {
   constructor(entity) {

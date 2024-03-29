@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const DbConnection = require('./DB/DbConnection');
-const playlistHandler = require('./DB/playlistHandler');
 
 const app = express();
 

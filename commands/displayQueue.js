@@ -24,7 +24,7 @@ module.exports = {
     if (playlist.queue.size() === 0 && playlist.current == null) {
       embed.setTitle('The queue is empty');
       embed.setColor('#ff0000');
-      interaction.reply({ embeds: [embed] });
+      interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
     embed.setColor('#9747FF');
@@ -44,6 +44,6 @@ module.exports = {
       embed.setThumbnail(queue[0].thumbnail);
     }
 
-    interaction.reply({ embeds: [embed] });
+    interaction.reply({ embeds: [embed], ephemeral: true });
   },
 };

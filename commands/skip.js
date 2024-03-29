@@ -8,23 +8,23 @@ module.exports = {
   execute: async ({ interaction, connectionManager }) => {
     const { playlist } = connectionManager.findConnection(interaction.guildId);
     if (!playlist.queue) {
-      await interaction.reply('there is no song playlist.');
+      await interaction.reply({ content: 'there is no song playlist.', ephemeral: true });
       return;
     }
     const embed = new EmbedBuilder();
     if (playlist.queue.isEmpty()) {
       embed.setTitle('You can`t skip this is the last song, add another song to skip');
-      interaction.reply({ embeds: [embed] });
+      interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
     if (!playlist.player.playing) {
-      interaction.reply('You can`t skip there is no song playing');
+      interaction.reply({ content: 'You can`t skip there is no song playing', ephemeral: true });
       return;
     }
     const { channel } = interaction.member.voice;
     const existingUser = await playlist.checkUserSkip(interaction.user.id, interaction.user.username);
     if (existingUser) {
-      interaction.reply('You\'ve already voted to skip this song');
+      interaction.reply({ content: 'You\'ve already voted to skip this song', ephemeral: true });
       return;
     }
     playlist.current.setskip(interaction);

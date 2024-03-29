@@ -6,7 +6,6 @@ const {
   ComponentType,
   EmbedBuilder,
 } = require('discord.js');
-// const ytdl = require('ytdl-core');
 const { GetListByKeyword } = require('youtube-search-api');
 const Song = require('../Song');
 

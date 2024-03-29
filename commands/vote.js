@@ -32,12 +32,12 @@ const command = {
     const connection = connectionManager.findConnection(interaction.guildId);
     const { playlist } = connection;
     const songPlace = interaction.options.getString('song-number');
-    if (songPlace < 0 || songPlace > playlist.queue.size() + playlist.playedList.length || Number.isNaN(songPlace)) {
+    const song = connection.getSongByPlace(songPlace);
+    if (songPlace < 0 || !song || songPlace > playlist.queue.size() + playlist.playedList.length || Number.isNaN(songPlace)) {
       interaction.reply({ content: 'Invalid number', ephemeral: true });
       return;
     }
     try {
-      const song = connection.getSongByPlace(songPlace);
       const message = await setVote(interaction, songPlace, connection);
       const { channel } = interaction.member.voice;
       if ((song.disLikeCount()) === Math.ceil(channel.members.size / 2)) {

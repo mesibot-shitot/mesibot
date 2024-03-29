@@ -45,7 +45,6 @@ class Song {
     this.priority += newVote;
   }
 
-  // todo: implement recalculatePriority, Add statistical priority
   calculatePriority(stats) {
     const statsActions = stats.reduce((groups, stat) => {
       const { action, user } = stat;
@@ -78,14 +77,17 @@ class Song {
       songRemoved: -1,
     };
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const action in statsActions) {
       if (action in weights) {
         const actionWeight = weights[action];
         let userWeightedSum = 0;
         if (statsActions[action].users) {
+          // eslint-disable-next-line max-len
           userWeightedSum = statsActions[action].users.reduce((sum, userObj) => sum + userObj.count * actionWeight, 0);
         }
         const totalUserCount = statsActions[action].users ? statsActions[action].users.length : 0;
+        // eslint-disable-next-line max-len
         const actionWeightedCount = userWeightedSum + (statsActions[action].count || 0) * actionWeight;
         weightedAverage += actionWeightedCount / (totalUserCount || 1);
         totalWeight += Math.abs(actionWeight);

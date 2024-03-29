@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const Path = require('path');
-const { config } = require('dotenv');
+require('dotenv').config();
 
 class DbConnection {
   constructor() {

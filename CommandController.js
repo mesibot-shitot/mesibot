@@ -3,8 +3,6 @@ const { Routes } = require('discord-api-types/v9');
 const { REST } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-const { joinVoiceChannel, createAudioPlayer, getVoiceConnection } = require('@discordjs/voice');
-const Playlist = require('./Playlist');
 
 class CommandController {
   constructor() {

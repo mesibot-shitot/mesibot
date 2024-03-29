@@ -1,6 +1,5 @@
-const { joinVoiceChannel, createAudioPlayer, getVoiceConnection } = require('@discordjs/voice');
+const { getVoiceConnection } = require('@discordjs/voice');
 const Connection = require('./Connection');
-const Playlist = require('../Playlist');
 const PlaylistRepository = require('../repository/playlistRepository');
 
 const playlistDB = new PlaylistRepository();
@@ -21,8 +20,6 @@ class ConnectionManager {
     }
     const connection = new Connection(interaction, load, playlist);
     this.connections.push(connection);
-
-    //  todo check if connection exists in database
   }
 
   fetchGroupPlaylists(id) {

@@ -9,11 +9,8 @@ const statDB = new StatRepository();
 class Connection {
   playlist = null;
 
-  members = []; // todo for statistics
-
   constructor(interaction, load = false, playlistId = null) {
     this.group = interaction.guildId;
-    // this.getMembers(interaction);
     this.createConnection(interaction, load, playlistId);
   }
 
@@ -26,7 +23,6 @@ class Connection {
     const player = createAudioPlayer();
     this.connection.subscribe(player);
     const group = { id: interaction.guildId, owner: interaction.guild.ownerId };
-    // todo check playlist parameters
     if (load) {
       this.loadPlaylist(playlistId, group, player);
     } else {

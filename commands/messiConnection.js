@@ -1,5 +1,6 @@
 const {
-  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
+  SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType,
+  StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
 } = require('discord.js');
 
 const { getVoiceConnection } = require('@discordjs/voice');
@@ -42,7 +43,6 @@ module.exports = {
       time: 15000,
     });
     collector.on('collect', async (buttonInteraction) => {
-      const content = '';
       const { customId } = buttonInteraction;
       if (customId === 'import') {
         const select = new StringSelectMenuBuilder();
@@ -74,11 +74,11 @@ module.exports = {
       if (buttonInteraction.customId === 'new playlist') {
         await connectionManager.addConnection(interaction, false);
         await buttonInteraction.update({ content: 'create new playlist', ephemeral: true, components: [] });
-        await interaction.followUp('Let\'s get this party started!'); // todo fix duplicate message
+        await interaction.followUp('Let\'s get this party started!');
       }
     });
     collector.on('end', async () => {
-      await interaction.editReply({ content: 'Action Timed Out', components: [] });
+      await interaction.editReply({ content: 'Action Timed Out', ephemeral: true, components: [] });
     });
   },
 };
